@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import { Menu, X, Home, MoreHorizontal, ChevronDown, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useLayout } from '@/context/LayoutContext.jsx';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useLayout } from '@/app/context/LayoutContext.jsx';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/components/ui/dropdown-menu";
 import * as Icons from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/components/ui/button';
 
 const Header = ({ sections = [], siteContent = {} }) => {
     const { isSidePanelOpen, toggleSidePanel } = useLayout();

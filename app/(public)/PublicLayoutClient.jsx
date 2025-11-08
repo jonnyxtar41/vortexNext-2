@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import SidePanel from '@/components/SidePanel';
-import { useLayout } from '@/context/LayoutContext.jsx';
-import { cn } from '@/lib/utils';
+import Header from '@/app/components/Header';
+
+
+import Footer from '@/app/components/Footer';
+import SidePanel from '@/app/components/SidePanel';
+import { useLayout } from '@/app/context/LayoutContext';
+import { cn } from '@/app/lib/utils';
 import { usePathname } from 'next/navigation';
-import PushNotificationManager from '@/components/PushNotificationManager';
-import CookieConsent from '@/components/CookieConsent';
-import InterstitialAd from '@/components/InterstitialAd';
-import DownloadModal from '@/components/DownloadModal';
+import PushNotificationManager from '@/app/components/PushNotificationManager';
+import CookieConsent from '@/app/components/CookieConsent';
+import InterstitialAd from '@/app/components/InterstitialAd';
+import DownloadModal from '@/app/components/DownloadModal';
 
 const PublicLayoutClient = ({ children, sections, siteContent, allCategories }) => {
   const { isSidePanelOpen, setSidePanelOpen } = useLayout();

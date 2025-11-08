@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { applyTheme, predefinedThemes, getThemeConfig } from '@/lib/themes';
+import { applyTheme, predefinedThemes, getThemeConfig } from '@/app/lib/themes';
 
 const ThemeWatcher = () => {
   const { theme, resolvedTheme } = useTheme();

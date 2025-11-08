@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/customSupabaseClient';
+import { supabase } from '@/app/lib/customSupabaseClient';
 
 export const sendSuperadminNotificationEmail = async (postTitle, postUrl) => {
     try {

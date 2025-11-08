@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/customSupabaseClient';
-import { logActivity } from '@/lib/supabase/log';
+import { supabase } from '@/app/lib/customSupabaseClient';
+import { logActivity } from '@/app/lib/supabase/log';
 
 export const getSections = async () => {
     const { data, error } = await supabase

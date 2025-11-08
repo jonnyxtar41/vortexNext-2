@@ -1,7 +1,7 @@
 'use client';
 // src/context/AdContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { getAdsConfig } from '@/lib/ads';
+import { getAdsConfig } from '@/app/lib/ads';
 
 const AdContext = createContext();
 

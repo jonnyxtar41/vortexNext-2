@@ -1,8 +1,8 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { supabase } from '@/lib/customSupabaseClient';
-import { useToast } from '@/components/ui/use-toast';
-import { logActivity } from '@/lib/supabase/log';
+import { supabase } from '@/app/lib/customSupabaseClient';
+import { useToast } from '@/app/components/ui/use-toast';
+import { logActivity } from '@/app/lib/supabase/log';
 import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext(undefined);

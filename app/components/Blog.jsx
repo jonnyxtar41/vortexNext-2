@@ -3,8 +3,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import AdLink from '@/components/AdLink';
+import { Button } from '@/app/components/ui/button';
+import AdLink from '@/app/components/AdLink';
 
 const Blog = ({ randomPosts = [] }) => {
   return (

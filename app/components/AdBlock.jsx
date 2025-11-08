@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { Megaphone } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { getAdsConfig } from '@/lib/ads';
+import { cn } from '@//app/lib/utils';
+import { getAdsConfig } from '@//app/lib/ads';
 import parse from 'html-react-parser';
 
 const AdBlock = ({ adKey, className = '', variant = 'default' }) => {

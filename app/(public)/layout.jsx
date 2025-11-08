@@ -1,7 +1,7 @@
 import React from 'react';
-import { getSections } from '@/lib/supabase/sections';
-import { getAllSiteContent } from '@/lib/supabase/siteContent';
-import { getCategories } from '@/lib/supabase/categories';
+import { getSections } from '@/app/lib/supabase/sections';
+import { getAllSiteContent } from '@/app/lib/supabase/siteContent';
+import { getCategories } from '@/app/lib/supabase/categories';
 import PublicLayoutClient from './PublicLayoutClient';
 
 const PublicLayout = async ({ children }) => {

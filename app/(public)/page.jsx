@@ -1,9 +1,9 @@
 import dynamic from 'next/dynamic';
-import Hero from '@/components/Hero';
-import { getCategories } from '@/lib/supabase/categories';
-import { getFeaturedPosts, getDownloadablePosts } from '@/lib/supabase/posts';
-import { getAllSiteContent } from '@/lib/supabase/siteContent';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import Hero from '@/app/components/Hero';
+import { getCategories } from '@/app/lib/supabase/categories';
+import { getFeaturedPosts, getDownloadablePosts } from '@/app/lib/supabase/posts';
+import { getAllSiteContent } from '@/app/lib/supabase/siteContent';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 const LoadingSection = () => (
   <div className="w-full py-20 flex items-center justify-center bg-background/50">
@@ -11,11 +11,11 @@ const LoadingSection = () => (
   </div>
 );
 
-const Features = dynamic(() => import('@/components/Features'), { loading: () => <LoadingSection /> });
-const Blog = dynamic(() => import('@/components/Blog'), { loading: () => <LoadingSection /> });
-const RecentPosts = dynamic(() => import('@/components/RecentPosts'), { loading: () => <LoadingSection /> });
-const Downloads = dynamic(() => import('@/components/Downloads'), { loading: () => <LoadingSection /> });
-const AdBlock = dynamic(() => import('@/components/AdBlock'), { loading: () => <LoadingSection /> });
+const Features = dynamic(() => import('@/app/components/Features'), { loading: () => <LoadingSection /> });
+const Blog = dynamic(() => import('@/app/components/Blog'), { loading: () => <LoadingSection /> });
+const RecentPosts = dynamic(() => import('@/app/components/RecentPosts'), { loading: () => <LoadingSection /> });
+const Downloads = dynamic(() => import('@/app/components/Downloads'), { loading: () => <LoadingSection /> });
+const AdBlock = dynamic(() => import('@/app/components/AdBlock'), { loading: () => <LoadingSection /> });
 
 const Home = async () => {
   const [categoriesData, featuredPosts, downloadablePostsData, allContent] = await Promise.all([

@@ -3,9 +3,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useLayout } from '@/context/LayoutContext.jsx';
+import { useLayout } from '@/app/context/LayoutContext.jsx';
 import { Home, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/app/lib/utils';
 import * as Icons from 'lucide-react';
 
 const SectionItem = ({ section, categories, activeSection, activeCategory, onToggle, isOpen }) => {

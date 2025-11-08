@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAd } from '@/context/AdContext';
+import { useAd } from '@/app/context/AdContext';
 
 const AdLink = ({ href, children, className, ...props }) => {
     const { showAd } = useAd();

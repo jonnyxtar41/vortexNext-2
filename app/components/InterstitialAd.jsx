@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader } from 'lucide-react';
-import { useAd } from '@/context/AdContext';
-import { Button } from '@/components/ui/button';
-import { getAdsConfig } from '@/lib/ads';
+import { useAd } from '@/app/context/AdContext';
+import { Button } from '@/app/components/ui/button';
+import { getAdsConfig } from '@/app/lib/ads';
 import parse from 'html-react-parser';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/app/components/ui/dialog";
+import { cn } from '@/app/lib/utils';
 
 const InterstitialAd = () => {
     const adContext = useAd();

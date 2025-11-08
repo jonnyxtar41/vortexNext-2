@@ -2,9 +2,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/app/components/ui/use-toast';
 import Link from 'next/link';
-import AdBlock from '@/components/AdBlock';
+import AdBlock from '@/app/components/AdBlock';
 
 const Footer = ({ siteContent = {} }) => {
   const { toast } = useToast();

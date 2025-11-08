@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/customSupabaseClient';
+import { supabase } from '@/app/lib/customSupabaseClient';
 import { logActivity } from './log';
 
 export const getSiteContent = async (key) => {

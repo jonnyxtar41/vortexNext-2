@@ -1,13 +1,13 @@
 'use client';
 
-import { AuthProvider } from '@/contexts/SupabaseAuthContext';
+import { AuthProvider } from '@/app/contexts/SupabaseAuthContext';
 import { ThemeProvider } from 'next-themes';
-import ThemeWatcher from '@/components/ThemeWatcher';
-import { LayoutProvider } from '@/context/LayoutContext';
-import { AdProvider } from '@/context/AdContext';
-import { DownloadModalProvider } from '@/context/DownloadModalContext';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { Toaster } from '@/components/ui/toaster';
+import ThemeWatcher from '@/app/components/ThemeWatcher';
+import { LayoutProvider } from '@/app/context/LayoutContext';
+import { AdProvider } from '@/app/context/AdContext';
+import { DownloadModalProvider } from '@/app/context/DownloadModalContext';
+import { TooltipProvider } from '@/app/components/ui/tooltip';
+import { Toaster } from '@/app/components/ui/toaster';
 
 export function Providers({ children }) {
   return (

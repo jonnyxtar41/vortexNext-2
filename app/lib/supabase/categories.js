@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/customSupabaseClient';
-import { logActivity } from '@/lib/supabase/log';
+import { supabase } from '@/app/lib/customSupabaseClient';
+import { logActivity } from '@/app/lib/supabase/log';
 
 // This comment is added to force a re-transpilation/re-evaluation of this module.
 

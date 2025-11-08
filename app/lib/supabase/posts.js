@@ -1,90 +1,98 @@
 
-import { supabase } from '@/lib/customSupabaseClient';
-import { logActivity } from '@/lib/supabase/log';
-import { sendSuperadminNotificationEmail } from '@/lib/supabase/email';
-import { getSiteContent } from '@/lib/supabase/siteContent';
+import { supabase } from '@/app/lib/customSupabaseClient';
+import { logActivity } from '@/app/lib/supabase/log';
+import { sendSuperadminNotificationEmail } from '@/app/lib/supabase/email';
+import { getSiteContent } from '@/app/lib/supabase/siteContent';
 
-export const getPosts = async (options = {}) => {
-    const {
-        section,
-        categoryName,
-        subcategoryName,
-        page = 1,
-        limit = 9,
-        searchQuery,
-        includeDrafts = false,
-        includePending = false,
-        includeScheduled = false,
-        userId
-    } = options;
 
-    
 
+
+// Pega esto en app/lib/supabase/posts.js
+// reemplazando la función getPosts existente
+export const getPosts = async ({ 
+    page = 1, 
+    limit = 10, 
+    section = null, 
+    categoryName = null, 
+    subcategoryName = null, // ¡Ahora se incluye!
+    searchQuery = null, 
+    all = false 
+}) => {
+
+
+// --- INICIO DEBUG 2 ---
+    console.log(`[DEBUG getPosts] Parámetros recibidos:`, { section, categoryName, subcategoryName, searchQuery, page });
+    // --- FIN DEBUG 2 ---
     let query = supabase
         .from('posts')
         .select(`
-            id, created_at, title, author, category_id, subcategory_id,
-            excerpt, date, image_description, main_image_url, slug,
-            show_author, custom_author_name, show_date, status, user_id,
-            section_id, is_premium, price, currency, download, published_at,
-            is_discount_active, discount_percentage, comments_enabled, custom_fields,
-            sections!inner(id, name, slug),
-            categories!left(id, name, gradient, section_id),
-            subcategories (id, name)
-        `, { count: 'exact' });
+            id, title, slug, excerpt, main_image_url, date,
+            show_date, show_author, custom_author_name, download,
+            image_description,
+            categories:categories ( name, slug, gradient ),
+            subcategories:subcategories ( name, slug ),
+            sections:sections!inner ( name, slug )
+        `, { count: 'exact' }) // ¡Select corregido y completo!
+        .eq('status', 'published')
+        .order('date', { ascending: false });
 
-    // If a section slug is provided, first get its ID
+    if (all) {
+        query = query.range(0, 500);
+    }
+
+    // --- Filtros (¡Esta es la parte corregida!) ---
     if (section) {
-        const { data: sectionData, error: sectionError } = await supabase
-            .from('sections')
-            .select('id')
-            .eq('slug', section)
-            .single();
-
-        if (sectionError || !sectionData) {
-            console.error('Error fetching section ID or section not found:', sectionError?.message || section);
-            return { data: [], count: 0 }; // Return empty if section not found
-        }
-        query = query.eq('section_id', sectionData.id);
+        // Filtra por el slug de la tabla relacionada 'sections'
+        query = query.eq('sections.slug', section);
     }
 
-    const statusFilters = [];
-
-    // Admin view: fetch everything we might want to manage
-    if (includeDrafts || includePending) {
-        statusFilters.push('status.eq.published');
-        statusFilters.push('status.eq.draft');
-        statusFilters.push('status.eq.pending_approval');
-        statusFilters.push('status.eq.scheduled'); // In admin, we want to see future scheduled posts
-    }
-    // Public view: fetch only published and due scheduled posts
-    else {
-        statusFilters.push('status.eq.published');
-        statusFilters.push('and(status.eq.scheduled,published_at.lte.now())');
+    if (categoryName) {
+        // Filtra por el slug de la tabla relacionada 'categories'
+        query = query.eq('categories.slug', categoryName);
     }
     
-    query = query.or(statusFilters.join(','));
+    if (subcategoryName) {
+        // Filtra por el slug de la tabla relacionada 'subcategories'
+        query = query.eq('subcategories.slug', subcategoryName); 
+    }
     
-    if (section) query = query.eq('sections.slug', section);
-    if (categoryName) query = query.eq('categories.name', categoryName);
-    if (subcategoryName) query = query.eq('subcategories.name', subcategoryName);
-    if (searchQuery) query = query.or(`title.ilike.%${searchQuery}%,excerpt.ilike.%${searchQuery}%`);
-    if (userId) query = query.eq('user_id', userId);
+    if (searchQuery) {
+        query = query.ilike('title', `%${searchQuery}%`);
+    }
 
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-    query = query.range(from, to);
-
-    query = query.order('created_at', { ascending: false });
+    // --- Paginación ---
+    if (!all) {
+        const from = (page - 1) * limit;
+        const to = page * limit - 1;
+        query = query.range(from, to);
+    }
 
     const { data, error, count } = await query;
 
+    console.log(`[DEBUG getPosts] Respuesta de Supabase:`, {
+        count: count,
+        error: error, // <-- Sospechoso #2 (RLS)
+        dataLength: data ? data.length : 'sin datos'
+    });
+    // --- FIN DEBUG 3 ---
+
     if (error) {
-        console.error('Error fetching posts:', error);
-        return { data: [], count: 0 };
+        console.error('Error fetching posts:', error.message);
+        return { data: [], count: 0, error };
     }
-    
-    return { data, count };
+
+    // --- Formato de Fecha (de la versión de Vite) ---
+    const formattedData = data.map(post => ({
+        ...post,
+        // Formatea la fecha para que el componente cliente la muestre bien
+        date: new Date(post.date).toLocaleString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        }),
+    }));
+
+    return { data: formattedData, count, error: null };
 };
 
 export const getPostBySlug = async (slug) => {
