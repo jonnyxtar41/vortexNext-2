@@ -1,0 +1,18 @@
+
+# En public/robots.txt
+
+User-agent: *
+Allow: /
+
+
+# Bloquear las rutas de administración y autenticación
+Disallow: /admin
+Disallow: /edit-post
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /update-password
+# (Añade cualquier otra ruta que no deba ser pública)
+
+
+Sitemap: https://zonavortex.com/sitemap.xml
