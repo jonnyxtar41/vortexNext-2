@@ -1,12 +1,14 @@
+// src/lib/customSupabaseClient.js
+
 import { createClient } from '@supabase/supabase-js';
 
-// Las variables ahora se cargan desde el archivo .env
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, 
-  typeof sessionStorage !== 'undefined' 
+export const supabase = createClient(supabaseUrl, supabaseAnonKey,
+  typeof sessionStorage !== 'undefined'
     ? {
+        // --- Opciones del Lado del Cliente ---
         auth: {
           storage: sessionStorage,
           autoRefreshToken: true,
@@ -14,5 +16,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey,
           detectSessionInUrl: true
         },
       }
-    : {}
+    : {
+        // --- Opciones del Lado del Servidor ---
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false, // <--- LA SOLUCIÓN
+          detectSessionInUrl: false
+        }
+      }
 );
