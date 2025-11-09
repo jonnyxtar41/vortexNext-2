@@ -67,7 +67,6 @@ export default async function PostPage({ params }) {
     // Lógica de "Recomendados" (posts aleatorios de la sección)
     const recommendedPosts = allPosts
       .filter(p => p.id !== post.id && !similarPostsData.some(rp => rp.id === p.id))
-      .sort(() => 0.5 - Math.random()) // Aleatorio
       .slice(0, 4); // Tomar 4
 
     // Lógica de "Similares" (completa hasta 3 si faltan)

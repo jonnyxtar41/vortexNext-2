@@ -12,30 +12,41 @@ import {
 } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { useToast } from "@/app/components/ui/use-toast";
-import { incrementPostStat } from '@/app/lib/supabase/posts'; // Asumimos que esta función está en la nueva ruta
+import { incrementPostStat } from '@/app/lib/supabase/posts';
 import AdBlock from '@/app/components/AdBlock';
 import AdLink from '@/app/components/AdLink';
 import { useDownloadModal } from '@/app/context/DownloadModalContext';
 import parse, { domToReact } from 'html-react-parser';
-import DOMPurify from 'dompurify';
 import CommentsSection from '@/app/components/CommentsSection';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/components/ui/dropdown-menu";
-import PostCard from '@/app/components/PostCard'; // ¡Necesitaremos este componente!
+import PostCard from '@/app/components/PostCard';
 
-// Componente de UI que recibe datos del Server Component
 export default function PostClientPage({ post, recommendedPosts, similarPosts }) {
     const [currentUrl, setCurrentUrl] = useState('');
     const { toast } = useToast();
     const { showModal } = useDownloadModal();
     const router = useRouter();
+    const [sanitizedContent, setSanitizedContent] = useState('');
 
-    // Efecto para incrementar visitas (acción del lado del cliente)
     useEffect(() => {
         if (post) {
             incrementPostStat(post.id, 'visits');
         }
-        // Obtenemos la URL actual en el cliente
         setCurrentUrl(window.location.href);
+
+        if (post.content) {
+            import('dompurify').then(DOMPurify => {
+                const sanitized = DOMPurify.sanitize(post.content, {
+                    ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div'],
+                    ADD_ATTR: [
+                        'style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 
+                        'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title',
+                        'data-align', 'data-youtube-video'
+                    ],
+                });
+                setSanitizedContent(sanitized);
+            });
+        }
     }, [post]);
     
     const handleCopyLink = () => {
@@ -76,7 +87,6 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
         showModal({ title: post.title, onConfirm: downloadFunction });
     };
 
-    // --- Lógica de Parseo de HTML (idéntica a Vite) ---
     const parseOptions = {
         replace: domNode => {
             if (domNode.attribs && domNode.attribs['data-ad-block']) {
@@ -126,8 +136,6 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
                         }
                     });
                 }
-                // ¡Importante! Usar next/image aquí es complejo con HTML dinámico.
-                // Por ahora, mantenemos <img>, pero para optimizar, esto se puede mejorar.
                 return <img {...attribs} className={alignClass} style={styleObject} alt={attribs.alt || ''} />;
             }
         }
@@ -141,13 +149,10 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
         }
     };
 
-    // --- Variables para Links (idénticas a Vite) ---
-    const currentSectionSlug = post.sections?.slug || 'blog'; // 'blog' como fallback
+    const currentSectionSlug = post.sections?.slug || 'blog';
     const categoryLink = post.categories ? `/${currentSectionSlug}?categoria=${encodeURIComponent(post.categories.name)}` : `/${currentSectionSlug}`;
     const subcategoryLink = post.categories && post.subcategories ? `/${currentSectionSlug}?categoria=${encodeURIComponent(post.categories.name)}&subcategoria=${encodeURIComponent(post.subcategories.name)}` : `/${currentSectionSlug}`;
 
-    // --- Renderizado (JSX casi idéntico a Vite) ---
-    // La única diferencia es que <Link to="..."> se vuelve <Link href="...">
     return (
         <main className="pt-8 pb-20">
             <div className="container mx-auto px-6">
@@ -250,14 +255,7 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
                             )}
                             
                             <div className="prose prose-invert prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-h2:text-3xl prose-p:leading-relaxed prose-a:text-link hover:prose-a:text-link-hover prose-img:rounded-xl">
-                            {post.content && typeof window !== 'undefined' && parse(DOMPurify.sanitize(post.content, {
-                                ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div'],
-                                ADD_ATTR: [
-                                    'style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 
-                                    'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title',
-                                    'data-align', 'data-youtube-video'
-                                ],
-                            }), parseOptions)}
+                                {sanitizedContent && parse(sanitizedContent, parseOptions)}
                             </div>
 
                             <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">

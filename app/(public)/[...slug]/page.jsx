@@ -162,8 +162,8 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // --- FIN DEBUG 1 ---
 
     // --- 3. Carga de Posts (en el servidor) ---
-    // Usamos los *slugs* para pasarlos a getPosts,
-    // que ya sabe cómo filtrar por slug
+    const isDownloadableSection = section.slug === 'descargables';
+
     const { data: posts, count: totalPosts } = await getPosts({
         section: section.slug,
         categoryName: category?.name,
@@ -171,6 +171,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
         searchQuery: searchQuery,
         page: page,
         limit: POSTS_PER_PAGE,
+        onlyDownloadable: isDownloadableSection, // ¡Aquí está la magia!
     });
 
    

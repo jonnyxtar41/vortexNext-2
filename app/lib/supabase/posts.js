@@ -14,14 +14,15 @@ export const getPosts = async ({
     limit = 10, 
     section = null, 
     categoryName = null, 
-    subcategoryName = null, // ¡Ahora se incluye!
+    subcategoryName = null,
     searchQuery = null, 
-    all = false 
+    all = false,
+    onlyDownloadable = false // Nuevo parámetro
 }) => {
 
 
 // --- INICIO DEBUG 2 ---
-    console.log(`[DEBUG getPosts] Parámetros recibidos:`, { section, categoryName, subcategoryName, searchQuery, page });
+    console.log(`[DEBUG getPosts] Parámetros recibidos:`, { section, categoryName, subcategoryName, searchQuery, page, onlyDownloadable });
     // --- FIN DEBUG 2 ---
     let query = supabase
         .from('posts')
@@ -59,6 +60,11 @@ export const getPosts = async ({
     
     if (searchQuery) {
         query = query.ilike('title', `%${searchQuery}%`);
+    }
+
+    // Nuevo filtro para descargables
+    if (onlyDownloadable) {
+        query = query.not('download', 'is', null);
     }
 
     // --- Paginación ---

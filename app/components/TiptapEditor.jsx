@@ -451,6 +451,7 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
         return false;
       },
     },
+    immediatelyRender: false, // Add this line
   });
 
   const handleImageUpload = useCallback((file) => {

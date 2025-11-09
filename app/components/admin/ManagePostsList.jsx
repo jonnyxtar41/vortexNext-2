@@ -29,8 +29,7 @@ const ManagePostsList = ({ posts, onUpdate, silentDelete }) => {
     };
     
     const getPostPath = (post) => {
-        const sectionSlug = post.sections?.slug || 'blog'; // Fallback a 'blog' si no hay sección
-        return `/${sectionSlug}/${post.slug}`;
+        return `/post/${post.slug}`;
     };
 
     return (

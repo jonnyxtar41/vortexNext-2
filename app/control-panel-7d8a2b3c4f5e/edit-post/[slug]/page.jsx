@@ -2,29 +2,16 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useToast } from '@/components/ui/use-toast';
-import { getPostBySlug, updatePost, addPostEdit } from '@/lib/supabase/posts';
-import { getCategories } from '@/lib/supabase/categories';
-import { getSections } from '@/lib/supabase/sections';
+import { useToast } from '@/app/components/ui/use-toast';
+import { getPostBySlug, updatePost, addPostEdit } from '@/app/lib/supabase/posts';
+import { getCategories } from '@/app/lib/supabase/categories';
+import { getSections } from '@/app/lib/supabase/sections';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PostForm from '@/components/admin/PostForm'; // Assuming PostForm will be moved to components
-import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { Button } from '@/components/ui/button';
+import PostForm from '@/app/components/admin/PostForm'; // Corrected path
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
+import { Button } from '@/app/components/ui/button';
 import { LogOut, ArrowLeft } from 'lucide-react';
-
-export async function generateMetadata({ params }) {
-  const post = await getPostBySlug(params.slug);
-  if (!post) {
-    return {
-      title: 'Post no encontrado',
-    };
-  }
-  return {
-    title: `Editar Recurso - ${post.title}`,
-    description: `Editando el recurso ${post.title}`,
-  };
-}
 
 const EditPost = ({ params }) => {
     const { slug } = params;
@@ -104,7 +91,7 @@ const EditPost = ({ params }) => {
         <div className="min-h-screen bg-background text-foreground">
             <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg">
                 <div className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-                    <h1 className="text-xl sm:text-2xl font-bold gradient-text">Zona Vortex</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">Zona Vortex</h1>
                     <div className="flex items-center gap-2 sm:gap-4">
                         <Link href="/control-panel-7d8a2b3c4f5e/dashboard">
                             <Button variant="outline" size="sm" className="h-9 px-2 sm:px-4">
@@ -127,7 +114,7 @@ const EditPost = ({ params }) => {
                     className="text-center mb-12 sm:mb-16"
                 >
                     <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-4 sm:mb-6">
-                        Editar <span className="gradient-text">{post.title}</span>
+                        Editar <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">{post.title}</span>
                     </h1>
                 </motion.div>
 
