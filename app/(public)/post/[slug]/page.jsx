@@ -5,7 +5,7 @@ import {
     getPostBySlug, 
     getRelatedPosts, 
     getPosts // Necesitamos getPosts para los "Recomendados"
-} from '@/app/lib/supabase/posts'; 
+} from '@/app/lib/supabase/client'; 
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import PostClientPage from '@/app/components/PostClientPage'; 

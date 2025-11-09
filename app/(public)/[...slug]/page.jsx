@@ -1,6 +1,6 @@
 // app/(public)/[...slug]/page.jsx
 
-import { getPosts } from '@/app/lib/supabase/posts';
+import { getPosts } from '@/app/lib/supabase/client';
 import PostListPage from '@/app/components/PostListPage';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -162,7 +162,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // --- FIN DEBUG 1 ---
 
     // --- 3. Carga de Posts (en el servidor) ---
-    const isDownloadableSection = section.slug === 'descargables';
+    const isDownloadableSection = section.slug === 'zona-freemium';
 
     const { data: posts, count: totalPosts } = await getPosts({
         section: section.slug,

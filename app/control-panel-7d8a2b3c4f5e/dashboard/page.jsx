@@ -8,7 +8,7 @@ import { supabase } from '@/app/lib/customSupabaseClient';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
-import { getPosts } from '@/app/lib/supabase/posts';
+import { getPosts } from '@/app/lib/supabase/client';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
 

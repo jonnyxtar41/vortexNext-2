@@ -1,4 +1,3 @@
-
 import { supabase } from '@/app/lib/customSupabaseClient';
 
 export const listSiteAssets = async () => {
@@ -70,6 +69,32 @@ export const uploadDownloadableAsset = async (file) => {
       .from('downloadable-assets')
       .getPublicUrl(data.path);
 
+    return publicUrlData.publicUrl;
+};
+
+export const uploadPostImage = async (file) => {
+    if (!file) return null;
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+    const filePath = `post-images/${fileName}`; // Upload to a 'post-images' folder
+
+    const { data, error } = await supabase.storage
+      .from('site-assets') // Use the 'site-assets' bucket
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false, // Don't upsert to avoid overwriting files
+      });
+
+    if (error) {
+      console.error('Error uploading post image:', error);
+      return null;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('site-assets')
+      .getPublicUrl(data.path);
+      
     return publicUrlData.publicUrl;
 };
 

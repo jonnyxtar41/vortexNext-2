@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/app/components/ui/use-toast';
-import { getPostBySlug, updatePost, addPostEdit } from '@/app/lib/supabase/posts';
+import { getPostBySlug, addPostEdit } from '@/app/lib/supabase/client';
+import { updatePostAction } from '@/app/actions/posts';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
 import { useRouter } from 'next/navigation';
@@ -50,11 +51,11 @@ const EditPost = ({ params }) => {
         const statusToSubmit = updatedData.status;
 
         if (isAdmin) {
-            const { data, error } = await updatePost(post.id, { ...updatedData, status: statusToSubmit });
+            const { data, error } = await updatePostAction(post.id, { ...updatedData, status: statusToSubmit });
             if (error) {
                 toast({
                     title: "❌ Error al actualizar",
-                    description: error.message,
+                    description: error,
                     variant: "destructive",
                 });
                 return false;

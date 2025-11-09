@@ -10,7 +10,8 @@ import ManageSubcategories from '@/app/components/admin/ManageSubcategories';
 import ManageSections from '@/app/components/admin/ManageSections';
 import { Search, Filter, Check, X, ShieldAlert, Loader2, Edit } from 'lucide-react';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
-import { getPosts, getPendingEdits, updatePostEditStatus, updatePost } from '@/app/lib/supabase/posts';
+import { getPosts, getPendingEdits, updatePostEditStatus } from '@/app/lib/supabase/client';
+import { approveAndPublishEdit } from '@/app/actions/posts';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
 import { Button } from '@/app/components/ui/button';
@@ -75,17 +76,17 @@ const ManageContent = () => {
     };
 
     const handleReview = async (edit, newStatus) => {
-        const { data: updatedEdit, error: updateError } = await updatePostEditStatus(edit.id, newStatus, user.id);
+        const { error: updateError } = await updatePostEditStatus(edit.id, newStatus, user.id);
         if (updateError) {
             toast({ title: 'Error al revisar la edición', description: updateError.message, variant: 'destructive' });
             return;
         }
 
         if (newStatus === 'approved') {
-            const finalData = { ...edit.proposed_data, status: 'published' };
-            const { error: postUpdateError } = await updatePost(edit.post_id, finalData);
-            if (postUpdateError) {
-                toast({ title: 'Error al aplicar y publicar la edición', description: postUpdateError.message, variant: 'destructive' });
+            const result = await approveAndPublishEdit(edit);
+            if (!result.success) {
+                toast({ title: 'Error al aplicar y publicar la edición', description: result.error, variant: 'destructive' });
+                // Revert the status on failure
                 await updatePostEditStatus(edit.id, 'pending', null);
                 return;
             }

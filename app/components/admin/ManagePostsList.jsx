@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { useToast } from '@/app/components/ui/use-toast';
-import { deletePost } from '@/app/lib/supabase/posts';
+import { deletePost } from '@/app/lib/supabase/client';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { Button } from '@/app/components/ui/button';
 import Link from 'next/link';

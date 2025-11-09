@@ -23,6 +23,7 @@ import {
   AlignCenter, AlignLeft, AlignRight, Trash2, Lock, Unlock,
   Bold, Italic, Underline as UnderlineIcon, Link as LinkIcon, Heading1, Heading2, Heading3, PaintBucket
 } from 'lucide-react';
+import { uploadPostImage } from '@/app/lib/supabase/assets';
 
 const PREDEFINED_COLORS = [
   { label: 'Negro', value: '#000000' },
@@ -407,7 +408,7 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
       }),
       ResizableImage.configure({
         inline: false,
-        allowBase64: true,
+        allowBase64: false,
       }),
       Placeholder.configure({ placeholder }),
       CharacterCount,
@@ -434,7 +435,7 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
       },
       handleDrop: (view, event) => {
         const file = event.dataTransfer?.files?.[0];
-        if (file) {
+        if (file && file.type.startsWith('image/')) {
           event.preventDefault();
           handleImageUpload(file);
           return true;
@@ -443,7 +444,7 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
       },
       handlePaste: (view, event) => {
         const file = event.clipboardData?.files?.[0];
-        if (file) {
+        if (file && file.type.startsWith('image/')) {
           event.preventDefault();
           handleImageUpload(file);
           return true;
@@ -454,7 +455,7 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
     immediatelyRender: false, // Add this line
   });
 
-  const handleImageUpload = useCallback((file) => {
+  const handleImageUpload = useCallback(async (file) => {
     if (!editor || !file || !file.type.startsWith('image/')) {
       toast({
         title: "❌ Tipo de archivo no válido",
@@ -463,9 +464,24 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
       });
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => editor.chain().focus().setImage({ src: e.target.result }).run();
-    reader.readAsDataURL(file);
+
+    toast({ title: "Subiendo imagen..." });
+
+    try {
+      const imageUrl = await uploadPostImage(file);
+      if (imageUrl) {
+        editor.chain().focus().setImage({ src: imageUrl }).run();
+        toast({ title: "✅ Imagen subida correctamente" });
+      } else {
+        throw new Error("No se pudo obtener la URL de la imagen.");
+      }
+    } catch (error) {
+      toast({
+        title: "❌ Error al subir la imagen",
+        description: error.message || "Ocurrió un problema al contactar el servidor de almacenamiento.",
+        variant: "destructive",
+      });
+    }
   }, [editor, toast]);
   
   const setLink = useCallback(() => {

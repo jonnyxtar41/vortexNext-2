@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation'; // Changed from 'react-router-dom'
 import TiptapEditor from '@/app/components/TiptapEditor'; // Adjusted path
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog'; // Adjusted path
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog"; // Adjusted path
-import { deletePost, getPosts } from '@/app/lib/supabase/posts'; // Adjusted path
+import { deletePost, getPosts } from '@/app/lib/supabase/client'; // Adjusted path
 import { uploadDownloadableAsset } from '@/app/lib/supabase/assets'; // Adjusted path
 import { Textarea } from '@/app/components/ui/textarea'; // Adjusted path
 import { supabase } from '@/app/lib/customSupabaseClient'; // Adjusted path

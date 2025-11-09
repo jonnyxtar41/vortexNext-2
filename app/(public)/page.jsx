@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import Hero from '@/app/components/Hero';
 import { getCategories } from '@/app/lib/supabase/categories';
-import { getFeaturedPosts, getDownloadablePosts } from '@/app/lib/supabase/posts';
+import { getFeaturedPosts, getDownloadablePosts } from '@/app/lib/supabase/client';
 import { getAllSiteContent } from '@/app/lib/supabase/siteContent';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 

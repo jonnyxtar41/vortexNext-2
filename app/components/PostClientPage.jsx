@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { useToast } from "@/app/components/ui/use-toast";
-import { incrementPostStat } from '@/app/lib/supabase/posts';
+import { incrementPostStat } from '@/app/lib/supabase/client';
 import AdBlock from '@/app/components/AdBlock';
 import AdLink from '@/app/components/AdLink';
 import { useDownloadModal } from '@/app/context/DownloadModalContext';
@@ -35,7 +35,8 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
         setCurrentUrl(window.location.href);
 
         if (post.content) {
-            import('dompurify').then(DOMPurify => {
+            import('dompurify').then(module => {
+                const DOMPurify = module.default;
                 const sanitized = DOMPurify.sanitize(post.content, {
                     ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div'],
                     ADD_ATTR: [
