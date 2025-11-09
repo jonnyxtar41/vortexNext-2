@@ -3,22 +3,22 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
-import { Button } from '@/app/components/ui/button'; // Ruta actualizada
-import { Input } from '@/app/components/ui/input'; // Ruta actualizada
-import { Label } from '@/app/components/ui/label'; // Ruta actualizada
-import { useToast } from '@/app/components/ui/use-toast'; // Ruta actualizada
-import { useSupabaseAuth } from '@/app/contexts/SupabaseAuthContext'; // Ruta actualizada
+import { LogIn, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
+import { useToast } from '@/app/components/ui/use-toast';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-// Este componente recibe 'isAdminLogin' para saber cómo comportarse
 const LoginForm = ({ isAdminLogin = false }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const { signIn } = useSupabaseAuth();
+    const [showPassword, setShowPassword] = useState(false);
+    const { signIn } = useAuth();
     const { toast } = useToast();
     const router = useRouter();
 
@@ -34,7 +34,7 @@ const LoginForm = ({ isAdminLogin = false }) => {
                 setError(signInError.message);
                 toast({
                     title: 'Error de inicio de sesión',
-                    description: 'Email o contraseña incorrectos.',
+                    description: signInError.message || 'Email o contraseña incorrectos.',
                     variant: 'destructive',
                 });
             } else {
@@ -42,9 +42,8 @@ const LoginForm = ({ isAdminLogin = false }) => {
                     title: '¡Éxito!',
                     description: 'Inicio de sesión completado.',
                 });
-                // Redirige al panel de admin si es login de admin, o al inicio si es público
-                router.push(isAdminLogin ? '/control-panel-7d8a2b3c4f5e' : '/');
-                router.refresh(); // Refresca para actualizar la sesión en el layout
+                router.push(isAdminLogin ? '/control-panel-7d8a2b3c4f5e/dashboard' : '/');
+                router.refresh();
             }
         } catch (err) {
             setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
@@ -59,32 +58,46 @@ const LoginForm = ({ isAdminLogin = false }) => {
     };
 
     const cardVariants = {
-        hidden: { opacity: 0, y: 50, scale: 0.9 },
-        visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, type: 'spring' } }
+        hidden: { opacity: 0, y: -50 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
     };
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
             <motion.div
-                variants={cardVariants}
                 initial="hidden"
                 animate="visible"
+                variants={cardVariants}
                 className="w-full max-w-md"
             >
-                <form 
-                    onSubmit={handleLogin} 
-                    className="glass-effect p-8 rounded-2xl shadow-2xl border border-border/20"
+                <form
+                    onSubmit={handleLogin}
+                    className="glass-effect p-8 rounded-2xl"
                 >
                     <div className="text-center mb-8">
-                        <Link href="/" className="inline-block mb-4">
-                            <img src="/logo.svg" alt="Zona Vortex Logo" className="h-16" />
-                        </Link>
-                        <h1 className="text-3xl font-bold text-foreground">
-                            {isAdminLogin ? 'Panel de Control' : 'Iniciar Sesión'}
-                        </h1>
-                        <p className="text-muted-foreground mt-2">
-                            {isAdminLogin ? 'Acceso exclusivo para administradores.' : 'Bienvenido de vuelta.'}
-                        </p>
+                        {!isAdminLogin && (
+                            <Link href="/" className="inline-block mb-4">
+                                <img src="/logo.svg" alt="Zona Vortex Logo" className="h-16" />
+                            </Link>
+                        )}
+                        
+                        {isAdminLogin ? (
+                            <>
+                                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent mb-2">
+                                    Admin Login
+                                </h1>
+                                <p className="text-muted-foreground">Accede a tu panel de control</p>
+                            </>
+                        ) : (
+                            <>
+                                <h1 className="text-3xl font-bold text-foreground">
+                                    Iniciar Sesión
+                                </h1>
+                                <p className="text-muted-foreground mt-2">
+                                    Bienvenido de vuelta.
+                                </p>
+                            </>
+                        )}
                     </div>
 
                     {error && (
@@ -95,62 +108,58 @@ const LoginForm = ({ isAdminLogin = false }) => {
                     )}
 
                     <div className="space-y-6">
-                        <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="tu@email.com"
-                                className="pl-10"
+                                placeholder={isAdminLogin ? "admin@example.com" : "tu@email.com"}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 disabled={loading}
+                                className="bg-input border-border"
                             />
                         </div>
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <div className="space-y-2 relative">
+                            <Label htmlFor="password">Contraseña</Label>
                             <Input
                                 id="password"
-                                type="password"
-                                placeholder="••••••••••"
-                                className="pl-10"
+                                type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 disabled={loading}
+                                className="bg-input border-border pr-10"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-9 text-muted-foreground"
+                                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                            >
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between mt-6 mb-8">
-                        {/* No mostramos 'olvidé contraseña' en el login de admin */}
-                        {!isAdminLogin && (
-                            <Link 
-                                href="/forgot-password" 
-                                className="text-sm text-primary hover:text-primary/80 transition-colors"
-                            >
-                                ¿Olvidaste tu contraseña?
-                            </Link>
-                        )}
-                        {/* Espaciador si es login de admin */}
-                        {isAdminLogin && <div />}
+                    <div className="mt-6 mb-8 text-center text-sm">
+                        <Link
+                            href="/forgot-password"
+                            className="font-semibold text-primary hover:underline"
+                        >
+                            ¿Olvidaste tu contraseña?
+                        </Link>
                     </div>
 
-                    <Button 
-                        type="submit" 
-                        className="w-full font-semibold text-lg py-6" 
+                    <Button
+                        type="submit"
+                        className="w-full"
                         disabled={loading}
                     >
-                        {loading ? 'Ingresando...' : (
-                            <>
-                                <LogIn className="w-5 h-5 mr-2" />
-                                {isAdminLogin ? 'Acceder' : 'Ingresar'}
-                            </>
-                        )}
+                        {loading ? 'Iniciando sesión...' : (isAdminLogin ? 'Iniciar Sesión' : 'Ingresar')}
                     </Button>
 
-                    {/* No mostramos 'registrar' en el login de admin */}
                     {!isAdminLogin && (
                         <p className="text-center text-sm text-muted-foreground mt-8">
                             ¿No tienes cuenta?{' '}

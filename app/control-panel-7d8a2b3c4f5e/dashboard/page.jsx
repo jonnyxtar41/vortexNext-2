@@ -4,13 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, FileText, Hash, Folder, Users, PlusSquare, Edit, BarChart, DollarSign, MessageSquare, BookOpen, Globe } from 'lucide-react';
-import { supabase } from '@/lib/customSupabaseClient';
+import { supabase } from '@/app/lib/customSupabaseClient';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { getPosts } from '@/lib/supabase/posts';
-import { getCategories } from '@/lib/supabase/categories';
-import { getSections } from '@/lib/supabase/sections';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
+import { getPosts } from '@/app/lib/supabase/posts';
+import { getCategories } from '@/app/lib/supabase/categories';
+import { getSections } from '@/app/lib/supabase/sections';
 
 const StatCard = ({ title, value, icon, color }) => (
     <div className="glass-effect p-4 md:p-6 rounded-2xl flex items-center justify-between">
@@ -49,7 +49,9 @@ const QuickAccessCard = ({ title, href, icon, isExternal = false }) => {
 const RecentItem = ({ item, type }) => {
     const isPost = type === 'post';
     const title = isPost ? item.title : item.message;
-    const date = formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: es });
+    const date = item.created_at
+        ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: es })
+        : 'Fecha desconocida';
 
     return (
         <div className="flex items-start gap-4 py-3 border-b border-border/10 last:border-b-0">

@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { getAllPostStats, getPosts } from '@/lib/supabase/posts';
-import { getCategories } from '@/lib/supabase/categories';
-import { getSections } from '@/lib/supabase/sections';
+import { getAllPostStats, getPosts } from '@/app/lib/supabase/posts';
+import { getCategories } from '@/app/lib/supabase/categories';
+import { getSections } from '@/app/lib/supabase/sections';
 import { BarChart as BarChartIcon, Eye, Download, Search, Filter, TrendingUp, FileText, Hash, Star } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
+import { Input } from '@/app/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import { useToast } from '@/app/components/ui/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { format, subDays } from 'date-fns';
 import { es } from 'date-fns/locale';

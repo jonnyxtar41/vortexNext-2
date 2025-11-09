@@ -17,8 +17,8 @@ import TableRow from '@tiptap/extension-table-row';
 import TableHeader from '@tiptap/extension-table-header';
 import BaseTableCell from '@tiptap/extension-table-cell';
 import TiptapToolbar from './TiptapToolbar';
-import { useToast } from '@/components/ui/use-toast';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { useToast } from '@/app/components/ui/use-toast';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuSeparator } from "@/app/components/ui/dropdown-menu";
 import {
   AlignCenter, AlignLeft, AlignRight, Trash2, Lock, Unlock,
   Bold, Italic, Underline as UnderlineIcon, Link as LinkIcon, Heading1, Heading2, Heading3, PaintBucket

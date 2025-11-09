@@ -130,6 +130,13 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     
     const slugArray = params.slug || [];
     
+    // --- ¡NUEVA VALIDACIÓN! ---
+    // Evita que esta ruta dinámica capture rutas reservadas de la aplicación.
+    const RESERVED_PATHS = ['admin', 'control-panel-7d8a2b3c4f5e', 'login', 'register', 'auth', 'edit-post', 'forgot-password', 'update-password'];
+    if (RESERVED_PATHS.includes(slugArray[0])) {
+        notFound();
+    }
+
     // --- 1. Obtener datos de Taxonomía ---
     const taxData = await getTaxonomyData(slugArray);
 

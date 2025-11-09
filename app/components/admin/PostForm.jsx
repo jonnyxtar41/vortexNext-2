@@ -1,32 +1,34 @@
+// app/components/admin/PostForm.jsx
+'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import PostFormInputs from '@/components/admin/post-form/PostFormInputs';
-import PostFormSidebar from '@/components/admin/post-form/PostFormSidebar';
-import PostFormSeo from '@/components/admin/post-form/PostFormSeo';
-import PostFormCustomFields from '@/components/admin/post-form/PostFormCustomFields';
-import PostPreview from '@/components/admin/post-form/PostPreview';
+import { useToast } from '@/app/components/ui/use-toast'; // Adjusted path
+import { Button } from '@/app/components/ui/button'; // Adjusted path
+import PostFormInputs from '@/app/components/admin/post-form/PostFormInputs'; // Adjusted path
+import PostFormSidebar from '@/app/components/admin/post-form/PostFormSidebar'; // Adjusted path
+import PostFormSeo from '@/app/components/admin/post-form/PostFormSeo'; // Adjusted path
+import PostFormCustomFields from '@/app/components/admin/post-form/PostFormCustomFields'; // Adjusted path
+import PostPreview from '@/app/components/admin/post-form/PostPreview'; // Adjusted path
 import { Save, Send, PlusCircle, Trash2, Edit, Eye, CalendarClock, Sparkles } from 'lucide-react';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { getCategories } from '@/lib/supabase/categories';
-import { getSubcategories } from '@/lib/supabase/subcategories';
-import { useRouter } from 'next/navigation';
-import TiptapEditor from '@/components/TiptapEditor';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { deletePost, getPosts } from '@/lib/supabase/posts';
-import { uploadDownloadableAsset } from '@/lib/supabase/assets';
-import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/lib/customSupabaseClient';
-import InternalLinkModal from '@/components/InternalLinkModal'; // <-- Importa el nuevo modal
+import { useAuth } from '@/app/contexts/SupabaseAuthContext'; // Adjusted path
+import { getCategories } from '@/app/lib/supabase/categories'; // Adjusted path
+import { getSubcategories } from '@/app/lib/supabase/subcategories'; // Adjusted path
+import { useRouter } from 'next/navigation'; // Changed from 'react-router-dom'
+import TiptapEditor from '@/app/components/TiptapEditor'; // Adjusted path
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog'; // Adjusted path
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog"; // Adjusted path
+import { deletePost, getPosts } from '@/app/lib/supabase/posts'; // Adjusted path
+import { uploadDownloadableAsset } from '@/app/lib/supabase/assets'; // Adjusted path
+import { Textarea } from '@/app/components/ui/textarea'; // Adjusted path
+import { supabase } from '@/app/lib/customSupabaseClient'; // Adjusted path
+import InternalLinkModal from '@/app/components/InternalLinkModal'; // Adjusted path
 
 const PostForm = ({ sections, onSave, onNewPost, initialData = {}, onUpdate }) => {
     
     const { toast } = useToast();
     const { user, permissions } = useAuth();
-    const router = useRouter();
+    const router = useRouter(); // Changed from useNavigate
     const editorRef = useRef(null);
 
     // Form state
@@ -405,7 +407,7 @@ DEVUELVE ÚNICAMENTE una lista de palabras clave separadas por comas (formato CS
         const success = await onSave(postData, isEditing, initialData);
 
         if (success && !isEditing) setIsSaved(true);
-        else if (success && isEditing) router.push('/control-panel-7d8a2b3c4f5e/dashboard');
+        else if (success && isEditing) router.push('/control-panel-7d8a2b3c4f5e/dashboard'); // Changed from navigate
     };
     
     useEffect(() => {
@@ -514,7 +516,7 @@ DEVUELVE ÚNICAMENTE una lista de palabras clave separadas por comas (formato CS
         } else {
             toast({ title: '🗑️ Recurso eliminado' });
             if (onUpdate) onUpdate();
-            router.push('/control-panel-7d8a2b3c4f5e/dashboard');
+            router.push('/control-panel-7d8a2b3c4f5e/dashboard'); // Changed from navigate
         }
     };
     
@@ -556,8 +558,8 @@ DEVUELVE ÚNICAMENTE una lista de palabras clave separadas por comas (formato CS
                                 onAiAction={handleAiAction}
                                 onGenerateContent={handleGenerateContentClick}
                                 getEditor={(editor) => { editorRef.current = editor; }}
-                                onInternalLink={() => setInternalLinkModalOpen(true)} // Nueva prop
-                                onSuggestLinks={handleSuggestLinks} // Nueva prop
+                                onInternalLink={() => setInternalLinkModalOpen(true)}
+                                onSuggestLinks={handleSuggestLinks}
                             />
                             {linkSuggestions.length > 0 && (
                                 <div className="mt-4 p-4 glass-effect rounded-lg">

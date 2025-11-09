@@ -1,6 +1,6 @@
 'use client';
 
-import ManageContent from '@/components/admin/ManageContent';
+import ManageContent from '@/app/components/admin/ManageContent';
 
 const ManageContentPage = () => {
     return <ManageContent />;

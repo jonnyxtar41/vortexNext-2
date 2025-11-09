@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import PostForm from '@/components/admin/PostForm';
-import { getSections } from '@/lib/supabase/sections';
-import { addPost } from '@/lib/supabase/posts';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
+import PostForm from '@/app/components/admin/PostForm';
+import { getSections } from '@/app/lib/supabase/sections';
+import { addPost } from '@/app/lib/supabase/posts';
+import { useToast } from '@/app/components/ui/use-toast';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 
 const AddResourcePage = () => {
     const { user } = useAuth();

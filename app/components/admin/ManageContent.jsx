@@ -1,61 +1,78 @@
+// app/components/admin/ManageContent.jsx
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import ManagePostsList from '@/components/admin/ManagePostsList';
-import ManageCategories from '@/components/admin/ManageCategories';
-import ManageSubcategories from '@/components/admin/ManageSubcategories';
-import ManageSections from '@/components/admin/ManageSections';
+import { Input } from '@/app/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import ManagePostsList from '@/app/components/admin/ManagePostsList';
+import ManageCategories from '@/app/components/admin/ManageCategories';
+import ManageSubcategories from '@/app/components/admin/ManageSubcategories';
+import ManageSections from '@/app/components/admin/ManageSections';
 import { Search, Filter, Check, X, ShieldAlert, Loader2, Edit } from 'lucide-react';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { getPendingEdits, updatePostEditStatus, updatePost, getPosts } from '@/lib/supabase/posts';
-import { getCategories } from '@/lib/supabase/categories';
-import { getSections } from '@/lib/supabase/sections';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { getSubcategories } from '@/lib/supabase/subcategories';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
+import { getPosts, getPendingEdits, updatePostEditStatus, updatePost } from '@/app/lib/supabase/posts';
+import { getCategories } from '@/app/lib/supabase/categories';
+import { getSections } from '@/app/lib/supabase/sections';
+import { Button } from '@/app/components/ui/button';
+import { useToast } from '@/app/components/ui/use-toast';
+import { getSubcategories } from '@/app/lib/supabase/subcategories';
+import { Switch } from '@/app/components/ui/switch';
+import { Label } from '@/app/components/ui/label';
 import Link from 'next/link';
 
 const ManageContent = () => {
     const { toast } = useToast();
     const { user, permissions } = useAuth();
+    
+    // Data states
     const [posts, setPosts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [sections, setSections] = useState([]);
+    const [pendingEdits, setPendingEdits] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
+
+    // UI/Filter states
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
     const [sortOrder, setSortOrder] = useState('date-desc');
-    const [pendingEdits, setPendingEdits] = useState([]);
-    const [subcategories, setSubcategories] = useState([]);
     const [silentDelete, setSilentDelete] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const isAdmin = permissions?.['manage-content'];
 
-    const fetchAllData = useCallback(async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
-        const [postsData, categoriesData, sectionsData, subcategoriesData, editsData] = await Promise.all([
-            getPosts({ includeDrafts: true, includePending: true, limit: 1000 }),
-            getCategories(),
-            getSections(),
-            getSubcategories(),
-            isAdmin ? getPendingEdits() : Promise.resolve([]),
-        ]);
-        setPosts(postsData.data || []);
-        setCategories(categoriesData || []);
-        setSections(sectionsData || []);
-        setSubcategories(subcategoriesData || []);
-        setPendingEdits(editsData || []);
-        setIsLoading(false);
-    }, [isAdmin]);
+        try {
+            const [postsData, categoriesData, sectionsData, subcategoriesData] = await Promise.all([
+                getPosts({ limit: 1000, includeDrafts: true, includePending: true }),
+                getCategories(),
+                getSections(),
+                getSubcategories()
+            ]);
+            setPosts(postsData.data || []);
+            setCategories(categoriesData || []);
+            setSections(sectionsData || []);
+            setSubcategories(subcategoriesData || []);
+
+            if (isAdmin) {
+                const edits = await getPendingEdits();
+                setPendingEdits(edits);
+            }
+        } catch (error) {
+            toast({ title: "Error al cargar datos", description: error.message, variant: "destructive" });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [isAdmin, toast]);
 
     useEffect(() => {
-        fetchAllData();
-    }, [fetchAllData]);
+        fetchData();
+    }, [fetchData]);
+
+    const handleUpdateAll = () => {
+        fetchData();
+    };
 
     const handleReview = async (edit, newStatus) => {
         const { data: updatedEdit, error: updateError } = await updatePostEditStatus(edit.id, newStatus, user.id);
@@ -75,7 +92,7 @@ const ManageContent = () => {
         }
         
         toast({ title: `Edición ${newStatus === 'approved' ? 'aprobada y publicada' : 'rechazada'}`, description: 'La revisión se ha completado.' });
-        fetchAllData();
+        handleUpdateAll();
     };
 
     const filteredAndSortedPosts = useMemo(() => {
@@ -116,6 +133,15 @@ const ManageContent = () => {
         return sorted;
     }, [posts, searchTerm, categoryFilter, statusFilter, sortOrder, isAdmin, user]);
 
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="ml-4 text-muted-foreground">Cargando contenido...</p>
+            </div>
+        );
+    }
+
     return (
         <div>
             <h2 className="text-3xl font-bold mb-8 text-center">Gestionar Contenido Existente</h2>
@@ -131,7 +157,7 @@ const ManageContent = () => {
                                     <p className="text-sm text-gray-400">Editado por: {edit.editor.email}</p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Link href={`/admin/edit-post/${edit.posts.slug}`}>
+                                    <Link href={`/control-panel-7d8a2b3c4f5e/edit-post/${edit.posts.slug}`}>
                                         <Button size="sm" variant="outline"><Edit className="w-4 h-4 mr-2" />Revisar y Editar</Button>
                                     </Link>
                                     <Button size="sm" variant="default" onClick={() => handleReview(edit, 'approved')}><Check className="w-4 h-4 mr-2" />Aprobar y Publicar</Button>
@@ -206,20 +232,13 @@ const ManageContent = () => {
                             )}
                         </div>
                     </div>
-                    {isLoading ? (
-                        <div className="flex justify-center items-center h-40">
-                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                            <p className="ml-4 text-muted-foreground">Cargando recursos...</p>
-                        </div>
-                    ) : (
-                        <ManagePostsList posts={filteredAndSortedPosts} onUpdate={fetchAllData} silentDelete={silentDelete} />
-                    )}
+                    <ManagePostsList posts={filteredAndSortedPosts} onUpdate={handleUpdateAll} silentDelete={silentDelete} />
                 </div>
                 {isAdmin && (
                   <div className="space-y-8">
-                    <ManageSections sections={sections} onUpdate={fetchAllData} />
-                    <ManageCategories categories={categories} sections={sections} onUpdate={fetchAllData} />
-                    <ManageSubcategories categories={categories} subcategories={subcategories} onUpdate={fetchAllData} />
+                    <ManageSections sections={sections} onUpdate={handleUpdateAll} />
+                    <ManageCategories categories={categories} sections={sections} onUpdate={handleUpdateAll} />
+                    <ManageSubcategories categories={categories} subcategories={subcategories} onUpdate={handleUpdateAll} />
                   </div>
                 )}
             </div>

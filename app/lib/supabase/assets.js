@@ -1,5 +1,5 @@
 
-import { supabase } from '@/lib/customSupabaseClient';
+import { supabase } from '@/app/lib/customSupabaseClient';
 
 export const listSiteAssets = async () => {
     const { data, error } = await supabase.storage

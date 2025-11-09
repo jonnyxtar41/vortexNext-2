@@ -11,9 +11,9 @@ import {
   Sparkles,
   Table, Columns, Rows, Merge, Split, Trash2, PaintBucket, EyeOff
 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/components/ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/app/components/ui/dropdown-menu";
+import { Button } from '@/app/components/ui/button';
 
 const PREDEFINED_COLORS = [
   { label: 'Negro', value: '#000000' },

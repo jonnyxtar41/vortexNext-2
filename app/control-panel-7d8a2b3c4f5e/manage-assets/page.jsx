@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useToast } from '@/app/components/ui/use-toast';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
 import { Upload, Trash2, Copy, Search, RefreshCw, ImageOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { listSiteAssets, deleteSiteAsset, uploadSiteAsset } from '@/lib/supabase/assets';
-import { getPostImageUrls } from '@/lib/supabase/posts'; // Import the new function
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { listSiteAssets, deleteSiteAsset, uploadSiteAsset } from '@/app/lib/supabase/assets';
+import { getPostImageUrls } from '@/app/lib/supabase/posts'; // Import the new function
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog";
 
 const ManageAssets = () => {
     const { toast } = useToast();

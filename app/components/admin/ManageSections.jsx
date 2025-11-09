@@ -1,13 +1,16 @@
+// app/components/admin/ManageSections.jsx
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useToast } from '@/app/components/ui/use-toast';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
 import { Edit, Trash2, GripVertical, PlusCircle, Save } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { addSection, updateSection, deleteSection, getPostCountForSection, getCategoryCountForSection, updateMultipleSections } from '@/lib/supabase/sections';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose } from '@/app/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog";
+import { addSection, updateSection, deleteSection, getPostCountForSection, getCategoryCountForSection, updateMultipleSections } from '@/app/lib/supabase/sections';
+import { Switch } from '@/app/components/ui/switch';
+import { Label } from '@/app/components/ui/label';
 import * as Icons from 'lucide-react';
 
 const ManageSections = ({ sections: initialSections, onUpdate }) => {

@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/customSupabaseClient';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { supabase } from '@/app/lib/customSupabaseClient';
+import { useToast } from '@/app/components/ui/use-toast';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { Database, Server, HardDrive, RefreshCw, AlertTriangle, CheckCircle, Table, Key, Link2, Share2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/components/ui/button';
 
 const StatCard = ({ title, value, icon, status, unit }) => {
     const statusColor = status === 'ok' ? 'text-green-400' : 'text-yellow-400';

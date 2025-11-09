@@ -2,19 +2,19 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useToast } from '@/components/ui/use-toast';
-import { getPayments, getAllSiteContent, updateSiteContent } from '@/lib/supabase/siteContent';
+import { useToast } from '@/app/components/ui/use-toast';
+import { getPayments, getAllSiteContent, updateSiteContent } from '@/app/lib/supabase/siteContent';
 import { DollarSign, CheckCircle, XCircle, Clock, Save, CreditCard, Info, Heart, Filter, Download, Repeat, MessageSquare, Banknote, Bitcoin } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert";
+import { Textarea } from '@/app/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import { Switch } from '@/app/components/ui/switch';
 
 const ManagePayments = () => {
     const { toast } = useToast();

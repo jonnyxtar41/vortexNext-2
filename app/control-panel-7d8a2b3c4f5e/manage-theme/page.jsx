@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useToast } from '@/app/components/ui/use-toast';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
 import { Palette, Save, PlusCircle, Trash2, Edit } from 'lucide-react';
-import { predefinedThemes, getCustomThemes, saveCustomThemes } from '@/lib/themes';
+import { predefinedThemes, getCustomThemes, saveCustomThemes } from '@/app/lib/themes';
 import { useTheme } from 'next-themes';
 import { HexColorPicker } from 'react-colorful';
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/app/components/ui/alert-dialog';
 
 // HSL to Hex and Hex to HSL conversion functions remain the same...
 const hslToHex = (hsl) => {

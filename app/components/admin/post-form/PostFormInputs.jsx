@@ -1,11 +1,14 @@
+// app/components/admin/post-form/PostFormInputs.jsx
+'use client';
+
 import React, { useRef } from 'react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/app/components/ui/input'; // Adjusted path
+import { Textarea } from '@/app/components/ui/textarea'; // Adjusted path
+import { Label } from '@/app/components/ui/label'; // Adjusted path
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'; // Adjusted path
+import { Button } from '@/app/components/ui/button'; // Adjusted path
 import { Sparkles } from 'lucide-react';
-import useAutosizeTextArea from '@/hooks/useAutosizeTextArea';
+import useAutosizeTextArea from '@/app/hooks/useAutosizeTextArea'; // Adjusted path
 
 const PostFormInputs = ({ 
     title, setTitle, 
@@ -98,4 +101,3 @@ const PostFormInputs = ({
 };
 
 export default PostFormInputs;
-  

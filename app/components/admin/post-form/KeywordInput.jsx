@@ -1,6 +1,9 @@
+// app/components/admin/post-form/KeywordInput.jsx
+'use client';
+
 import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/app/components/ui/input'; // Adjusted path
+import { Button } from '@/app/components/ui/button'; // Adjusted path
 import { X, PlusCircle } from 'lucide-react';
 
 const KeywordInput = ({ keywords, setKeywords, defaultKeywords }) => {

@@ -2,20 +2,20 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/app/components/ui/use-toast';
+import { Button } from '@/app/components/ui/button';
+import { Label } from '@/app/components/ui/label';
+import { Input } from '@/app/components/ui/input';
+import { Textarea } from '@/app/components/ui/textarea';
 import { Save, FileText, PlusCircle, Trash2, Upload, Bell, Image as ImageIcon, Search } from 'lucide-react';
-import { getAllSiteContent, updateSiteContent } from '@/lib/supabase/siteContent';
-import { uploadSiteAsset } from '@/lib/supabase/assets';
-import { getSections, addSection, updateSection, deleteSection } from '@/lib/supabase/sections';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { allIcons } from '@/lib/icons.js';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import TiptapEditor from '@/components/TiptapEditor';
+import { getAllSiteContent, updateSiteContent } from '@/app/lib/supabase/siteContent';
+import { uploadSiteAsset } from '@/app/lib/supabase/assets';
+import { getSections, addSection, updateSection, deleteSection } from '@/app/lib/supabase/sections';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import { allIcons } from '@/app/lib/icons.js';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/app/components/ui/dialog';
+import TiptapEditor from '@/app/components/TiptapEditor';
 
 const ManageSiteContent = ({ onUpdate }) => {
     const { toast } = useToast();

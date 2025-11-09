@@ -16,27 +16,35 @@ const AdminLayout = ({ children }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const navItems = [
-        { href: '/admin/dashboard', icon: Home, label: 'Dashboard', permission: 'dashboard' },
-        { href: '/admin/add-resource', icon: PlusSquare, label: 'Añadir Recurso', permission: 'add-resource' },
-        { href: '/admin/pending-posts', icon: Clock, label: 'Posts Pendientes', permission: 'can_publish_posts' },
-        { href: '/admin/manage-content', icon: Edit, label: 'Gestionar Contenido', permission: 'manage-content' },
-        { href: '/admin/analytics', icon: BarChart, label: 'Estadísticas', permission: 'analytics' },
-        { href: '/admin/payments', icon: DollarSign, label: 'Monetización', permission: 'payments' },
-        { href: '/admin/manage-users', icon: Users, label: 'Gestionar Usuarios', permission: 'manage-users' },
-        { href: '/admin/manage-roles', icon: UserCog, label: 'Gestionar Roles', permission: 'manage-roles' },
-        { href: '/admin/manage-theme', icon: Palette, label: 'Gestionar Tema', permission: 'manage-theme' },
-        { href: '/admin/manage-site-content', icon: FileText, label: 'Contenido del Sitio', permission: 'manage-site-content' },
-        { href: '/admin/manage-ads', icon: Folder, label: 'Gestionar Anuncios', permission: 'manage-ads' },
-        { href: '/admin/manage-assets', icon: FileImage, label: 'Gestionar Archivos', permission: 'manage-assets' },
-        { href: '/admin/manage-resources', icon: Database, label: 'Herramientas de Recursos', permission: 'manage-resources' },
-        { href: '/admin/manage-suggestions', icon: MessageSquare, label: 'Sugerencias', permission: 'manage-suggestions' },
-        { href: '/admin/activity-log', icon: Shield, label: 'Registro de Actividad', permission: 'activity-log' },
-        { href: '/admin/credentials', icon: Settings, label: 'Credenciales', permission: 'credentials' },
+        { href: '/control-panel-7d8a2b3c4f5e/dashboard', icon: Home, label: 'Dashboard', permission: 'dashboard' },
+        { href: '/control-panel-7d8a2b3c4f5e/add-resource', icon: PlusSquare, label: 'Añadir Recurso', permission: 'add-resource' },
+        { href: '/control-panel-7d8a2b3c4f5e/pending-posts', icon: Clock, label: 'Posts Pendientes', permission: 'can_publish_posts' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-content', icon: Edit, label: 'Gestionar Contenido', permission: 'manage-content' },
+        { href: '/control-panel-7d8a2b3c4f5e/analytics', icon: BarChart, label: 'Estadísticas', permission: 'analytics' },
+        { href: '/control-panel-7d8a2b3c4f5e/payments', icon: DollarSign, label: 'Monetización', permission: 'payments' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-users', icon: Users, label: 'Gestionar Usuarios', permission: 'manage-users' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-roles', icon: UserCog, label: 'Gestionar Roles', permission: 'manage-roles' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-theme', icon: Palette, label: 'Gestionar Tema', permission: 'manage-theme' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-site-content', icon: FileText, label: 'Contenido del Sitio', permission: 'manage-site-content' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-ads', icon: Folder, label: 'Gestionar Anuncios', permission: 'manage-ads' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-assets', icon: FileImage, label: 'Gestionar Archivos', permission: 'manage-assets' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-resources', icon: Database, label: 'Herramientas de Recursos', permission: 'manage-resources' },
+        { href: '/control-panel-7d8a2b3c4f5e/manage-suggestions', icon: MessageSquare, label: 'Sugerencias', permission: 'manage-suggestions' },
+        { href: '/control-panel-7d8a2b3c4f5e/activity-log', icon: Shield, label: 'Registro de Actividad', permission: 'activity-log' },
+        { href: '/control-panel-7d8a2b3c4f5e/credentials', icon: Settings, label: 'Credenciales', permission: 'credentials' },
         { href: '#logout', icon: LogOut, label: 'Cerrar Sesión', action: signOut }
     ].filter(item => item.action || (permissions && permissions[item.permission]));
 
+    // Check if the current path is the admin login page
+    const isLoginPage = pathname === '/control-panel-7d8a2b3c4f5e';
+
     if (authLoading) {
         return <div className="flex justify-center items-center h-screen bg-background text-foreground">Cargando panel de administración...</div>;
+    }
+
+    // If it's the login page, just render the children without the layout
+    if (isLoginPage) {
+        return <>{children}</>;
     }
 
     return (

@@ -1,15 +1,18 @@
+// app/components/admin/post-form/PostFormSidebar.jsx
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { Label } from '@/app/components/ui/label'; // Adjusted path
+import { Switch } from '@/app/components/ui/switch'; // Adjusted path
+import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group'; // Adjusted path
+import { Input } from '@/app/components/ui/input'; // Adjusted path
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'; // Adjusted path
+import { useAuth } from '@/app/contexts/SupabaseAuthContext'; // Adjusted path
 import { DollarSign, Percent, CalendarClock, Save, Book, Trash2, Loader2, MessageSquare, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { useToast } from '@/components/ui/use-toast';
-import { getTemplates, saveTemplate, deleteTemplate } from '@/lib/supabase/templates';
+import { Button } from '@/app/components/ui/button'; // Adjusted path
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog'; // Adjusted path
+import { useToast } from '@/app/components/ui/use-toast'; // Adjusted path
+import { getTemplates, saveTemplate, deleteTemplate } from '@/app/lib/supabase/templates'; // Adjusted path
 
 const PostFormSidebar = ({
     hasDownload, setHasDownload,
@@ -27,7 +30,7 @@ const PostFormSidebar = ({
     discountPercentage, setDiscountPercentage,
     isScheduled, setIsScheduled,
     publishedAt, setPublishedAt,
-    isFeatured, setIsFeatured, // Nueva prop
+    isFeatured, setIsFeatured,
     onLoadTemplate,
     getTemplateData,
     commentsEnabled, setCommentsEnabled,

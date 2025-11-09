@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/customSupabaseClient';
-import { logActivity } from '@/lib/supabase/log';
+import { supabase } from '@/app/lib/customSupabaseClient';
+import { logActivity } from '@/app/lib/supabase/log';
 
 export const getSubcategories = async (options = {}) => {
     const { categoryId } = options;

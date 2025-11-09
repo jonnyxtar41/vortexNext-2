@@ -1,3 +1,6 @@
+// app/components/admin/post-form/SeoPreview.jsx
+'use client';
+
 import React from 'react';
 
 const SeoPreview = ({ title, description, slug }) => {

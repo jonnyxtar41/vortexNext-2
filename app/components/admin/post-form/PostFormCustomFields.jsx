@@ -1,8 +1,11 @@
+// app/components/admin/post-form/PostFormCustomFields.jsx
+'use client';
+
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/app/components/ui/button'; // Adjusted path
+import { Input } from '@/app/components/ui/input'; // Adjusted path
 import { Trash2, PlusCircle } from 'lucide-react';
-import { Label } from '@/components/ui/label';
+import { Label } from '@/app/components/ui/label'; // Adjusted path
 
 const PostFormCustomFields = ({ customFields, setCustomFields }) => {
     const handleAddField = () => {
