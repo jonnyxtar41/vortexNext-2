@@ -1,27 +1,11 @@
-// src/lib/customSupabaseClient.js
+// app/lib/customSupabaseClient.js
 
-import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// 1. Importa el NUEVO "ayudante" de cliente
+//    (Este es el archivo que creamos en el Paso 1 de mi respuesta anterior)
+import { createClient } from '@/app/utils/supabase/client';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey,
-  typeof sessionStorage !== 'undefined'
-    ? {
-        // --- Opciones del Lado del Cliente ---
-        auth: {
-          storage: sessionStorage,
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: true
-        },
-      }
-    : {
-        // --- Opciones del Lado del Servidor ---
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false, // <--- LA SOLUCIÓN
-          detectSessionInUrl: false
-        }
-      }
-);
+// 2. Crea y exporta la instancia del cliente.
+//    Esta función ahora usa 'createBrowserClient' de @supabase/ssr
+//    internamente, lo cual es seguro para el navegador.
+export const supabase = createClient();

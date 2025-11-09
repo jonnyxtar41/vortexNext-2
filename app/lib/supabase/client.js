@@ -1,5 +1,5 @@
 import { supabase } from '@/app/lib/customSupabaseClient';
-import { logActivity } from '@/app/lib/supabase/log';
+
 
 /**
  * Increments a specific statistic for a post. This is safe to call from the client-side.
@@ -26,6 +26,7 @@ export const getPosts = async ({
     searchQuery = null, 
     all = false,
     onlyDownloadable = false,
+    isPremium = null,
     includeDrafts = false,
     includePending = false
 }) => {
@@ -70,6 +71,10 @@ export const getPosts = async ({
     if (onlyDownloadable) {
         query = query.not('download', 'is', null);
     }
+    
+    if (isPremium !== null) {
+        query = query.eq('is_premium', isPremium);
+    }
 
     if (!all) {
         const from = (page - 1) * limit;
@@ -111,39 +116,6 @@ export const getPendingEdits = async () => {
     return data || [];
 };
 
-export const updatePostEditStatus = async (editId, status, reviewerId) => {
-    const { data, error } = await supabase
-        .from('post_edits')
-        .update({ status, reviewed_at: new Date(), reviewer_id: reviewerId })
-        .eq('id', editId)
-        .select()
-        .single();
-
-    return { data, error };
-};
-
-export const deletePost = async (postId, postTitle, shouldLog = true) => {
-    const { data: existingPost, error: fetchError } = await supabase
-        .from('posts')
-        .select('status')
-        .eq('id', postId)
-        .single();
-
-    if (fetchError) {
-        console.error('Error fetching post for status check:', fetchError);
-    }
-
-    const { error } = await supabase
-        .from('posts')
-        .delete()
-        .eq('id', postId);
-
-    if (!error && shouldLog && existingPost && existingPost.status === 'published') {
-        logActivity(`Usuario eliminó el recurso: "${postTitle}"`, { postId });
-    }
-
-    return { error };
-};
 
 export const getPostBySlug = async (slug) => {
     const { data, error } = await supabase
@@ -167,14 +139,6 @@ export const getPostBySlug = async (slug) => {
     return data;
 };
 
-export const addPostEdit = async (editData) => {
-    const { data, error } = await supabase
-        .from('post_edits')
-        .insert([editData])
-        .select();
-    
-    return { data, error };
-};
 
 export const getRelatedPosts = async (postId, keywords, limit = 3) => {
     if (!keywords || keywords.length === 0) {

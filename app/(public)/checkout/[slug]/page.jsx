@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getPostBySlug } from '@/lib/supabase/posts';
+import { getPostBySlug } from '@/app/lib/supabase/posts';
 import { useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/components/ui/button';
 
 const CheckoutPage = () => {
     const { slug } = useParams();

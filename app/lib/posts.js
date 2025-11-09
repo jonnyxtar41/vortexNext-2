@@ -1,3 +1,5 @@
+'use server';
+
 import { supabase } from '@/lib/customSupabaseClient';
 import { logActivity } from '@/lib/supabase/log';
 import { sendSuperadminNotificationEmail } from '@/lib/supabase/email';

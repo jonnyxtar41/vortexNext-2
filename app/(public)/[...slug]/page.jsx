@@ -151,31 +151,37 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     const page = parseInt(searchParams.page || '1', 10);
     const searchQuery = searchParams.q || '';
 
-    // --- INICIO DEBUG 1 ---
-    console.log(`\n[DEBUG page.jsx] Llamando a getPosts con:`, {
-        section: section.slug,
-        categoryName: category?.slug,
-        subcategoryName: subcategory?.slug,
-        searchQuery: searchQuery,
-        page: page,
-    });
-    // --- FIN DEBUG 1 ---
 
-    // --- 3. Carga de Posts (en el servidor) ---
-    const isDownloadableSection = section.slug === 'zona-freemium';
 
-    const { data: posts, count: totalPosts } = await getPosts({
+
+
+// 1. Define tus parámetros de consulta base
+    let postParams = {
         section: section.slug,
         categoryName: category?.name,
         subcategoryName: subcategory?.name,
         searchQuery: searchQuery,
         page: page,
         limit: POSTS_PER_PAGE,
-        onlyDownloadable: isDownloadableSection, // ¡Aquí está la magia!
-    });
+        onlyDownloadable: false, // Default a false
+        isPremium: null          // Default a null (usa el filtro de client.js)
+    };
 
-   
+    // 2. Comprueba si estamos en la sección "Freemium"
+    if (section.slug === 'zona-freemium') {
+        // 3. ¡Sobrescribe los filtros!
+        postParams.section = null;          // NO filtres por esta sección
+        postParams.categoryName = null;     // NO filtres por categoría
+        postParams.subcategoryName = null;  // NO filtres por subcategoría
+        postParams.isPremium = true;      // <-- ¡Pide solo posts Premium!
+        postParams.onlyDownloadable = true; // <-- Y que también sean descargables
+    } else {
+        // (Opcional) Si la zona-freemium es la ÚNICA que muestra descargables
+        // postParams.onlyDownloadable = false; 
+    }
 
+    // 4. Llama a getPosts con los parámetros correctos
+    const { data: posts, count: totalPosts } = await getPosts(postParams);
 
 
     const totalPages = Math.ceil((totalPosts || 0) / POSTS_PER_PAGE);

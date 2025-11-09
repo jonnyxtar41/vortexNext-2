@@ -18,7 +18,9 @@ import { useRouter } from 'next/navigation'; // Changed from 'react-router-dom'
 import TiptapEditor from '@/app/components/TiptapEditor'; // Adjusted path
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog'; // Adjusted path
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog"; // Adjusted path
-import { deletePost, getPosts } from '@/app/lib/supabase/client'; // Adjusted path
+
+import { getPosts } from '@/app/lib/supabase/client'; // Adjusted path
+import { deletePostAction } from '@/app/actions/posts'; 
 import { uploadDownloadableAsset } from '@/app/lib/supabase/assets'; // Adjusted path
 import { Textarea } from '@/app/components/ui/textarea'; // Adjusted path
 import { supabase } from '@/app/lib/customSupabaseClient'; // Adjusted path
@@ -510,7 +512,7 @@ DEVUELVE ÚNICAMENTE una lista de palabras clave separadas por comas (formato CS
 
     const handleDeletePost = async () => {
         if (!isEditing) return;
-        const { error } = await deletePost(initialData.id, initialData.title, true);
+        const { error } = await deletePostAction(initialData.id, initialData.title);
         if (error) {
             toast({ title: '❌ Error al eliminar', variant: 'destructive' });
         } else {

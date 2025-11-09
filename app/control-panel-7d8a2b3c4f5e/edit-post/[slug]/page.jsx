@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/app/components/ui/use-toast';
-import { getPostBySlug, addPostEdit } from '@/app/lib/supabase/client';
+import { getPostBySlug } from '@/app/lib/supabase/client';
+import { addPostEditAction } from '@/app/actions/posts';
 import { updatePostAction } from '@/app/actions/posts';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
@@ -73,7 +74,7 @@ const EditPost = ({ params }) => {
                 proposed_data: updatedData,
                 status: 'pending_approval'
             };
-            const { error } = await addPostEdit(editPayload);
+            const { error } = await addPostEditAction(editPayload);
             if (error) {
                 toast({ title: "❌ Error al enviar para revisión", description: error.message, variant: "destructive" });
                 return false;

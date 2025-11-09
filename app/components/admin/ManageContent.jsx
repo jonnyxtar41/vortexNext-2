@@ -10,7 +10,9 @@ import ManageSubcategories from '@/app/components/admin/ManageSubcategories';
 import ManageSections from '@/app/components/admin/ManageSections';
 import { Search, Filter, Check, X, ShieldAlert, Loader2, Edit } from 'lucide-react';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
-import { getPosts, getPendingEdits, updatePostEditStatus } from '@/app/lib/supabase/client';
+
+import { getPosts, getPendingEdits } from '@/app/lib/supabase/client';
+import { updatePostEditStatusAction } from '@/app/actions/posts';
 import { approveAndPublishEdit } from '@/app/actions/posts';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
@@ -87,7 +89,7 @@ const ManageContent = () => {
             if (!result.success) {
                 toast({ title: 'Error al aplicar y publicar la edición', description: result.error, variant: 'destructive' });
                 // Revert the status on failure
-                await updatePostEditStatus(edit.id, 'pending', null);
+                await updatePostEditStatusAction(edit.id, 'pending', null);
                 return;
             }
         }
