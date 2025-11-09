@@ -148,7 +148,7 @@ const PostListPage = ({
                                     className="glass-effect rounded-2xl overflow-hidden flex flex-col group card-hover"
                                 >
                                     {/* Enlazamos al post individual */}
-                                    <AdLink to={`/post/${post.slug}`} className="flex flex-col h-full">
+                                    <AdLink href={`/post/${post.slug}`} className="flex flex-col h-full">
                                         <div className="overflow-hidden relative">
                                             <img className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500" alt={post.image_description} src={post.main_image_url || "https://images.unsplash.com/photo-1595872018818-97555653a011"} />
                                             <div className={`absolute inset-0 bg-gradient-to-t ${post.categories?.gradient || 'from-gray-500 to-gray-700'} opacity-50`}></div>

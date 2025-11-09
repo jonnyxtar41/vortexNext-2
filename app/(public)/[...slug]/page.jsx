@@ -159,12 +159,14 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // que ya sabe cómo filtrar por slug
     const { data: posts, count: totalPosts } = await getPosts({
         section: section.slug,
-        categoryName: category?.slug,
-        subcategoryName: subcategory?.slug,
+        categoryName: category?.name,
+        subcategoryName: subcategory?.name,
         searchQuery: searchQuery,
         page: page,
         limit: POSTS_PER_PAGE,
     });
+
+   
 
 
 

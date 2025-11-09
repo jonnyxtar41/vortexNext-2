@@ -29,10 +29,10 @@ export const getPosts = async ({
             id, title, slug, excerpt, main_image_url, date,
             show_date, show_author, custom_author_name, download,
             image_description,
-            categories:categories ( name, slug, gradient ),
-            subcategories:subcategories ( name, slug ),
+            categories:categories ( name, gradient ),
+            subcategories:subcategories ( name ),
             sections:sections!inner ( name, slug )
-        `, { count: 'exact' }) // ¡Select corregido y completo!
+        `, { count: 'exact' }) 
         .eq('status', 'published')
         .order('date', { ascending: false });
 
@@ -44,16 +44,17 @@ export const getPosts = async ({
     if (section) {
         // Filtra por el slug de la tabla relacionada 'sections'
         query = query.eq('sections.slug', section);
+        console.log(`[DEBUG getPosts] Filtrando por sección: ${section}`); // <-- DEBUG 
     }
 
     if (categoryName) {
-        // Filtra por el slug de la tabla relacionada 'categories'
-        query = query.eq('categories.slug', categoryName);
+        // Filtra por el NOMBRE de la tabla relacionada 'categories'
+        query = query.eq('categories.name', categoryName);
     }
     
     if (subcategoryName) {
-        // Filtra por el slug de la tabla relacionada 'subcategories'
-        query = query.eq('subcategories.slug', subcategoryName); 
+        // Filtra por el NOMBRE de la tabla relacionada 'subcategories'
+        query = query.eq('subcategories.name', subcategoryName); 
     }
     
     if (searchQuery) {
