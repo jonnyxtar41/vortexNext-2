@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAllSiteContent } from '@/lib/supabase/siteContent';
-import { Button } from '@/components/ui/button';
+import { getAllSiteContent } from '@/app/lib/supabase/siteContent';
+import { Button } from '@/app/components/ui/button';
 
 const DonatePage = () => {
     const [content, setContent] = useState({});

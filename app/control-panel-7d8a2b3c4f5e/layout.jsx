@@ -5,8 +5,9 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, PlusSquare, Edit, BarChart, Users, Palette, Shield, Settings, FileText, DollarSign, MessageSquare, Folder, FileImage, Menu, X, LogOut, UserCog, Database, Clock } from 'lucide-react';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { useToast } from '@/components/ui/use-toast';
+
+import { useToast } from '@/app/components/ui/use-toast';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 
 const AdminLayout = ({ children }) => {
     const { user, permissions, loading: authLoading, signOut, isSuperAdmin } = useAuth();

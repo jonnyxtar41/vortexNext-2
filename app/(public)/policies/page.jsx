@@ -1,40 +1,36 @@
-'use client';
+// app/(public)/policies/page.jsx
 
-import { useState, useEffect } from 'react';
-import { getAllSiteContent } from '@/lib/supabase/siteContent';
-import parse from 'html-react-parser';
+import { getSiteContent } from '@/app/lib/supabase/siteContent'; // Usamos la función específica de Vite
+import PoliciesPageClient from './PoliciesPageClient'; // Importamos el nuevo componente cliente
+import { Suspense } from 'react';
+import { unstable_noStore as noStore } from 'next/cache';
 
-const PoliciesPage = () => {
-    const [content, setContent] = useState('');
-    const [loading, setLoading] = useState(true);
+// 1. Generación de Metadata (reemplaza a Helmet de Vite)
+export async function generateMetadata() {
+    return {
+        title: 'Políticas - Zona Vortex',
+        description: 'Políticas y términos de uso de Zona Vortex.',
+    };
+}
 
-    useEffect(() => {
-        const fetchContent = async () => {
-            setLoading(true);
-            const allContent = await getAllSiteContent();
-            const contentMap = allContent.reduce((acc, item) => {
-                acc[item.key] = item.value;
-                return acc;
-            }, {});
-            setContent(contentMap.policies_page_content || '');
-            setLoading(false);
-        };
-
-        fetchContent();
-    }, []);
+// 2. El Componente Page (Server Component)
+export default async function PoliciesPage() {
+    noStore(); // Esta página es dinámica, no la queremos cachear estáticamente
+    
+    // 3. Cargar datos en el servidor
+    // (Usamos la función de la versión Vite para ser precisos)
+    const policiesContent = await getSiteContent('policies_page_content');
+    const content = policiesContent || '<h1>Políticas</h1><p>No se pudo cargar el contenido de las políticas. Por favor, configúralo en el panel de administración.</p>';
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8">Políticas de Privacidad</h1>
-            {loading ? (
-                <p>Cargando...</p>
-            ) : (
-                <div className="prose dark:prose-invert max-w-none">
-                    {parse(content)}
-                </div>
-            )}
-        </div>
+        // 4. Usar Suspense para un fallback de carga
+        <Suspense fallback={
+            <div className="container mx-auto h-screen flex items-center justify-center">
+                Cargando políticas...
+            </div>
+        }>
+            {/* 5. Pasar los datos al Componente Cliente para que renderice la UI */}
+            <PoliciesPageClient content={content} />
+        </Suspense>
     );
-};
-
-export default PoliciesPage;
+}

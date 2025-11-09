@@ -1,9 +1,15 @@
 // app/(public)/post/[slug]/page.jsx
 
-import { getPostBySlug, getRelatedPosts } from '@/app/lib/supabase/posts'; // ¡Importa getRelatedPosts!
+// Importa todas las funciones de fetching que necesitas
+import { 
+    getPostBySlug, 
+    getRelatedPosts, 
+    getPosts // Necesitamos getPosts para los "Recomendados"
+} from '@/app/lib/supabase/posts'; 
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import PostClientPage from '@/app/components/PostClientPage'; // ¡Importa el nuevo componente cliente!
+import PostClientPage from '@/app/components/PostClientPage'; 
+import { unstable_noStore as noStore } from 'next/cache';
 
 // --- Generación de Metadata (SEO) ---
 // (Tu función generateMetadata está perfecta, no la cambies)
@@ -30,25 +36,52 @@ export async function generateMetadata({ params }) {
                 },
             ],
         },
+        // Aquí puedes agregar los JSON-LD que tenías en VITE
+        alternates: {
+            canonical: `/post/${post.slug}`,
+        },
     };
 }
 
 // --- El Componente Page (Server Component) ---
 export default async function PostPage({ params }) {
+    noStore(); // Evita que esta página se cachee estáticamente si necesitas visitas en tiempo real
     const { slug } = params;
     
     // --- 1. Cargar Datos del Post ---
     const post = await getPostBySlug(slug);
     
-    // Si no hay post, 404
     if (!post) {
         notFound();
     }
 
-    // --- 2. Cargar Posts Relacionados ---
-    // Usamos los keywords del post principal para encontrar posts similares
-    const relatedPosts = await getRelatedPosts(post.id, post.keywords, 3); // Limita a 3
+    // --- 2. Cargar Posts Relacionados y Recomendados (Lógica de Vite migrada al servidor) ---
+    const [
+        { data: allPosts }, // Para "Recomendados"
+        similarPostsData    // Para "Similares"
+    ] = await Promise.all([
+        getPosts({ section: post.sections?.slug, limit: 10 }), // Trae 10 para elegir aleatorios
+        getRelatedPosts(post.id, post.keywords, 3) // Trae 3 por keywords
+    ]);
 
+    // Lógica de "Recomendados" (posts aleatorios de la sección)
+    const recommendedPosts = allPosts
+      .filter(p => p.id !== post.id && !similarPostsData.some(rp => rp.id === p.id))
+      .sort(() => 0.5 - Math.random()) // Aleatorio
+      .slice(0, 4); // Tomar 4
+
+    // Lógica de "Similares" (completa hasta 3 si faltan)
+    let finalSimilarPosts = [...similarPostsData];
+    if (finalSimilarPosts.length < 3) {
+        const categoryPosts = allPosts
+            .filter(p => 
+                p.category_id === post.category_id && 
+                p.id !== post.id && 
+                !finalSimilarPosts.some(sp => sp.id === p.id)
+            );
+        finalSimilarPosts.push(...categoryPosts.slice(0, 3 - finalSimilarPosts.length));
+    }
+    
     // --- 3. Renderizar Componente Cliente ---
     return (
         <Suspense fallback={
@@ -56,10 +89,13 @@ export default async function PostPage({ params }) {
                 Cargando post...
             </div>
         }>
-            {/* Pasa los datos del servidor (post y relatedPosts) 
-                al componente cliente que maneja la UI.
-            */}
-            <PostClientPage post={post} relatedPosts={relatedPosts} />
+            {/* Pasamos TODOS los datos al componente cliente */}
+            <PostClientPage 
+                post={post} 
+                relatedPosts={[]} // 'relatedPosts' ya no se usa, pasamos 'recommended' y 'similar'
+                recommendedPosts={recommendedPosts}
+                similarPosts={finalSimilarPosts}
+            />
         </Suspense>
     );
 }

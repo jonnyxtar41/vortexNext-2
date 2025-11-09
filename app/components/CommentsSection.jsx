@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getCommentsByPostId, addComment } from '@/lib/supabase/comments';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
+import { getCommentsByPostId, addComment } from '@/app/lib/supabase/comments';
+import { Button } from '@/app/components/ui/button';
+import { Textarea } from '@/app/components/ui/textarea';
+import { Input } from '@/app/components/ui/input';
+import { useToast } from '@/app/components/ui/use-toast';
 import { Loader2, Send } from 'lucide-react';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 
 const Comment = ({ comment, onReply }) => (
     <div className="p-4 my-4 bg-background/50 rounded-lg">
