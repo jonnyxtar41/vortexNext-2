@@ -10,7 +10,7 @@ import { useToast } from '@/app/components/ui/use-toast';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 
 const AdminLayout = ({ children }) => {
-    const { user, permissions, loading: authLoading, signOut, isSuperAdmin } = useAuth();
+    const { user, permissions, signOut, isSuperAdmin } = useAuth();
     const { toast } = useToast();
     const pathname = usePathname();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -37,10 +37,6 @@ const AdminLayout = ({ children }) => {
 
     // Check if the current path is the admin login page
     const isLoginPage = pathname === '/control-panel-7d8a2b3c4f5e';
-
-    if (authLoading) {
-        return <div className="flex justify-center items-center h-screen bg-background text-foreground">Cargando panel de administración...</div>;
-    }
 
     // If it's the login page, just render the children without the layout
     if (isLoginPage) {

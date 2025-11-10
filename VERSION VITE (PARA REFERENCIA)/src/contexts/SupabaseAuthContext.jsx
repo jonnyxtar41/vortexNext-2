@@ -1,15 +1,14 @@
-'use client';
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { supabase } from '@/app/lib/customSupabaseClient';
-import { useToast } from '@/app/components/ui/use-toast';
-import { logActivity } from '@/app/lib/supabase/log';
-import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/customSupabaseClient';
+import { useToast } from '@/components/ui/use-toast';
+import { logActivity } from '@/lib/supabase/log';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const { toast } = useToast();
-  const router = useRouter();
+  const navigate = useNavigate();
   const authStateChangeRef = useRef(null);
 
   const [user, setUser] = useState(null);
@@ -17,16 +16,14 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [permissions, setPermissions] = useState(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleSignOut = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setPermissions(null);
-    setIsAdmin(false);
-    router.push('/control-panel-7d8a2b3c4f5e');
-  }, [router]);
+    navigate('/control-panel-7d8a2b3c4f5e');
+  }, [navigate]);
 
   const handleSession = useCallback(async (currentSession) => {
     setSession(currentSession);
@@ -41,15 +38,12 @@ export const AuthProvider = ({ children }) => {
             if (error) {
                 console.error('Error fetching user permissions:', error);
                 setPermissions({});
-                setIsAdmin(false);
             } else {
                 setPermissions(data || {});
-                setIsAdmin(Object.keys(data || {}).length > 0);
             }
         } catch (e) {
             console.error('Catastrophic error fetching permissions', e)
             setPermissions({});
-            setIsAdmin(false);
         }
 
         try {
@@ -67,18 +61,15 @@ export const AuthProvider = ({ children }) => {
     } else {
       setPermissions(null);
       setIsSuperAdmin(false);
-      setIsAdmin(false);
     }
   }, []);
 
   useEffect(() => {
     const getInitialSession = async () => {
-      console.log('getInitialSession called');
       setLoading(true);
       const { data: { session: initialSession } } = await supabase.auth.getSession();
       await handleSession(initialSession);
       setLoading(false);
-      console.log('getInitialSession completed');
     };
 
     getInitialSession();
@@ -174,12 +165,11 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setSession(null);
       setPermissions(null);
-      setIsAdmin(false);
-      router.push('/control-panel-7d8a2b3c4f5e');
+      navigate('/control-panel-7d8a2b3c4f5e');
     }
 
     return { error };
-  }, [toast, router]);
+  }, [toast, navigate]);
 
   const sendPasswordResetEmail = useCallback(async (email) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -204,14 +194,13 @@ export const AuthProvider = ({ children }) => {
     loading,
     permissions,
     isSuperAdmin,
-    isAdmin,
     signUp,
     signIn,
     signOut,
     sendPasswordResetEmail,
     updateUserPassword,
     updateUserEmail,
-  }), [user, session, loading, permissions, isSuperAdmin, isAdmin, signUp, signIn, signOut, sendPasswordResetEmail, updateUserPassword, updateUserEmail]);
+  }), [user, session, loading, permissions, signUp, signIn, signOut, sendPasswordResetEmail, updateUserPassword, updateUserEmail]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
