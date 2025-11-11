@@ -1,7 +1,6 @@
-import { supabase } from '@/app/lib/customSupabaseClient';
 import { logActivity } from '@/app/lib/supabase/log';
 
-export const getSections = async () => {
+export const getSections = async (supabase) => {
     const { data, error } = await supabase
         .from('sections')
         .select('*')
@@ -14,7 +13,7 @@ export const getSections = async () => {
     return data;
 };
 
-export const addSection = async (sectionData) => {
+export const addSection = async (supabase, sectionData) => {
     const { data, error } = await supabase
         .from('sections')
         .insert([sectionData])
@@ -23,7 +22,7 @@ export const addSection = async (sectionData) => {
     return { data, error };
 };
 
-export const updateSection = async (sectionId, sectionData) => {
+export const updateSection = async (supabase, sectionId, sectionData) => {
     const { data, error } = await supabase
         .from('sections')
         .update(sectionData)
@@ -33,7 +32,7 @@ export const updateSection = async (sectionId, sectionData) => {
     return { data, error };
 };
 
-export const updateMultipleSections = async (sections) => {
+export const updateMultipleSections = async (supabase, sections) => {
     const { data, error } = await supabase
         .from('sections')
         .upsert(sections)
@@ -42,7 +41,7 @@ export const updateMultipleSections = async (sections) => {
     return { data, error };
 };
 
-export const deleteSection = async (sectionId, sectionName) => {
+export const deleteSection = async (supabase, sectionId, sectionName) => {
     const { error } = await supabase
         .from('sections')
         .delete()
@@ -51,7 +50,7 @@ export const deleteSection = async (sectionId, sectionName) => {
     return { error };
 };
 
-export const getPostCountForSection = async (sectionId) => {
+export const getPostCountForSection = async (supabase, sectionId) => {
     const { count, error } = await supabase
         .from('posts')
         .select('*', { count: 'exact', head: true })
@@ -65,7 +64,7 @@ export const getPostCountForSection = async (sectionId) => {
     return count;
 };
 
-export const getCategoryCountForSection = async (sectionId) => {
+export const getCategoryCountForSection = async (supabase, sectionId) => {
     const { count, error } = await supabase
         .from('categories')
         .select('*', { count: 'exact', head: true })

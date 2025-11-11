@@ -6,6 +6,9 @@ import { Input } from '@/app/components/ui/input';
 import { useToast } from '@/app/components/ui/use-toast';
 import { Loader2, Send } from 'lucide-react';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
+import { createClient } from '@/app/utils/supabase/client';
+
+const supabase = createClient();
 
 const Comment = ({ comment, onReply }) => (
     <div className="p-4 my-4 bg-background/50 rounded-lg">
@@ -44,7 +47,7 @@ const CommentsSection = ({ postId }) => {
 
     const fetchComments = async () => {
         setLoading(true);
-        const fetchedComments = await getCommentsByPostId(postId);
+        const fetchedComments = await getCommentsByPostId(supabase, postId);
         setComments(fetchedComments);
         setLoading(false);
     };
@@ -61,7 +64,7 @@ const CommentsSection = ({ postId }) => {
         }
 
         setIsSubmitting(true);
-        const { error } = await addComment({
+        const { error } = await addComment(supabase, {
             post_id: postId,
             content: newComment,
             author_name: authorName,

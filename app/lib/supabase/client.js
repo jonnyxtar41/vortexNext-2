@@ -1,12 +1,11 @@
-import { supabase } from '@/app/lib/customSupabaseClient';
-
 
 /**
  * Increments a specific statistic for a post. This is safe to call from the client-side.
+ * @param {object} supabase - The Supabase client instance.
  * @param {string} postId - The ID of the post to update.
  * @param {string} statType - The statistic to increment (e.g., 'visits', 'downloads').
  */
-export const incrementPostStat = async (postId, statType) => {
+export const incrementPostStat = async (supabase, postId, statType) => {
     if (!postId || !statType) return;
     const { error } = await supabase.rpc('increment_post_stat', { 
         post_id_to_update: postId, 
@@ -17,7 +16,7 @@ export const incrementPostStat = async (postId, statType) => {
     }
 };
 
-export const getPosts = async ({ 
+export const getPosts = async (supabase, { 
     page = 1, 
     limit = 10, 
     section = null, 
@@ -101,7 +100,7 @@ export const getPosts = async ({
     return { data: formattedData, count, error: null };
 };
 
-export const getPendingEdits = async () => {
+export const getPendingEdits = async (supabase) => {
     const { data, error } = await supabase
         .from('post_edits')
         .select(`*, posts (title, slug), editor_id`)
@@ -117,7 +116,7 @@ export const getPendingEdits = async () => {
 };
 
 
-export const getPostBySlug = async (slug) => {
+export const getPostBySlug = async (supabase, slug) => {
     const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -140,7 +139,7 @@ export const getPostBySlug = async (slug) => {
 };
 
 
-export const getRelatedPosts = async (postId, keywords, limit = 3) => {
+export const getRelatedPosts = async (supabase, postId, keywords, limit = 3) => {
     if (!keywords || keywords.length === 0) {
         return [];
     }
@@ -161,7 +160,7 @@ export const getRelatedPosts = async (postId, keywords, limit = 3) => {
     return data;
 };
 
-export const getFeaturedPosts = async (options = {}) => {
+export const getFeaturedPosts = async (supabase, options = {}) => {
     const { limit = 6 } = options;
     const { data, error } = await supabase
         .from('posts')
@@ -178,7 +177,7 @@ export const getFeaturedPosts = async (options = {}) => {
     return data;
 };
 
-export const getDownloadablePosts = async (count) => {
+export const getDownloadablePosts = async (supabase, count) => {
   const { data, error } = await supabase
     .from('posts')
     .select('*, categories(name, gradient), sections(slug)')
@@ -194,3 +193,66 @@ export const getDownloadablePosts = async (count) => {
 
   return data;
 };
+
+export const getAllSiteContent = async (supabase) => {
+    const { data, error } = await supabase
+        .from('site_content')
+        .select('*');
+
+    if (error) {
+        console.error('Error fetching all site content:', error);
+        return [];
+    }
+    return data;
+};
+
+export const addPayment = async (supabase, paymentData) => {
+    const { data, error } = await supabase
+        .from('payments')
+        .insert([paymentData])
+        .select();
+    
+    if (error) {
+        console.error('Error adding payment:', error);
+    }
+
+    return { data, error };
+};
+
+export const getAllPostStats = async (supabase) => {
+    const { data, error } = await supabase
+        .from('post_stats')
+        .select('*');
+    
+    if (error) {
+        console.error('Error fetching all post stats:', error);
+        return [];
+    }
+
+    return data;
+};
+
+export const getPayments = async (supabase) => {
+    const { data, error } = await supabase
+        .from('payments')
+        .select('*')
+        .order('created_at', { ascending: false });
+    if (error) {
+        console.error('Error fetching payments:', error);
+        return [];
+    }
+    return data;
+};
+
+export const updateSiteContent = async (supabase, key, value) => {
+    const { data, error } = await supabase
+        .from('site_content')
+        .upsert({ key, value }, { onConflict: 'key' })
+        .select();
+
+    if (error) {
+        console.error(`Error updating site content for key ${key}:`, error);
+    }
+    return { data, error };
+};
+

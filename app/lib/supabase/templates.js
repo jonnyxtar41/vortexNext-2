@@ -1,7 +1,5 @@
 
-import { supabase } from '@/app/lib/customSupabaseClient';
-
-export const getTemplates = async () => {
+export const getTemplates = async (supabase) => {
     const { data, error } = await supabase
         .from('post_templates')
         .select('*')
@@ -14,7 +12,7 @@ export const getTemplates = async () => {
     return data;
 };
 
-export const saveTemplate = async (name, content) => {
+export const saveTemplate = async (supabase, name, content) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: { message: 'User not authenticated' } };
 
@@ -26,7 +24,7 @@ export const saveTemplate = async (name, content) => {
     return { data, error };
 };
 
-export const deleteTemplate = async (templateId) => {
+export const deleteTemplate = async (supabase, templateId) => {
     const { data, error } = await supabase
         .from('post_templates')
         .delete()

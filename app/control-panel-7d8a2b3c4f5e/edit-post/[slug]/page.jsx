@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useToast } from '@/app/components/ui/use-toast';
 import { getPostBySlug } from '@/app/lib/supabase/client';
 import { addPostEditAction } from '@/app/actions/posts';
-import { updatePostAction } from '@/app/actions/posts';
+import { updatePost } from '@/app/lib/actions/post-actions';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,9 @@ import PostForm from '@/app/components/admin/PostForm'; // Corrected path
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { Button } from '@/app/components/ui/button';
 import { LogOut, ArrowLeft } from 'lucide-react';
+import { createClient } from '@/app/utils/supabase/client';
+
+const supabase = createClient();
 
 const EditPost = ({ params }) => {
     const { slug } = params;
@@ -28,9 +31,9 @@ const EditPost = ({ params }) => {
 
     const fetchData = useCallback(async () => {
         setLoading(true);
-        const postData = await getPostBySlug(slug);
-        const categoriesData = await getCategories();
-        const sectionsData = await getSections();
+        const postData = await getPostBySlug(supabase, slug);
+        const categoriesData = await getCategories(supabase);
+        const sectionsData = await getSections(supabase);
 
         if (postData) {
             setPost(postData);
@@ -52,7 +55,7 @@ const EditPost = ({ params }) => {
         const statusToSubmit = updatedData.status;
 
         if (isAdmin) {
-            const { data, error } = await updatePostAction(post.id, { ...updatedData, status: statusToSubmit });
+            const { data, error } = await updatePost(post.id, { ...updatedData, status: statusToSubmit });
             if (error) {
                 toast({
                     title: "❌ Error al actualizar",

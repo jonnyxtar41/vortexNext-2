@@ -1,8 +1,8 @@
 import dynamic from 'next/dynamic';
 import Hero from '@/app/components/Hero';
+import { createClient } from '@/app/utils/supabase/server';
 import { getCategories } from '@/app/lib/supabase/categories';
-import { getFeaturedPosts, getDownloadablePosts } from '@/app/lib/supabase/client';
-import { getAllSiteContent } from '@/app/lib/supabase/siteContent';
+import { getFeaturedPosts, getDownloadablePosts, getAllSiteContent } from '@/app/lib/supabase/client';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 const LoadingSection = () => (
@@ -18,11 +18,12 @@ const Downloads = dynamic(() => import('@/app/components/Downloads'), { loading:
 const AdBlock = dynamic(() => import('@/app/components/AdBlock'), { loading: () => <LoadingSection /> });
 
 const Home = async () => {
+  const supabase = createClient();
   const [categoriesData, featuredPosts, downloadablePostsData, allContent] = await Promise.all([
-    getCategories(),
-    getFeaturedPosts({ limit: 6 }),
-    getDownloadablePosts(6),
-    getAllSiteContent(),
+    getCategories(supabase),
+    getFeaturedPosts(supabase, { limit: 6 }),
+    getDownloadablePosts(supabase, 6),
+    getAllSiteContent(supabase),
   ]);
 
   // Sanitize data to make it serializable for client components

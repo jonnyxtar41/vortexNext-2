@@ -1,6 +1,4 @@
-// app/(public)/post/[slug]/page.jsx
-
-// Importa todas las funciones de fetching que necesitas
+import { createClient } from '@/app/utils/supabase/server';
 import { 
     getPostBySlug, 
     getRelatedPosts, 
@@ -14,7 +12,8 @@ import { unstable_noStore as noStore } from 'next/cache';
 // --- Generación de Metadata (SEO) ---
 // (Tu función generateMetadata está perfecta, no la cambies)
 export async function generateMetadata({ params }) {
-    const post = await getPostBySlug(params.slug);
+    const supabase = createClient();
+    const post = await getPostBySlug(supabase, params.slug);
     if (!post) {
         return {
             title: 'No encontrado - Zona Vortex',
@@ -46,10 +45,11 @@ export async function generateMetadata({ params }) {
 // --- El Componente Page (Server Component) ---
 export default async function PostPage({ params }) {
     noStore(); // Evita que esta página se cachee estáticamente si necesitas visitas en tiempo real
+    const supabase = createClient();
     const { slug } = params;
     
     // --- 1. Cargar Datos del Post ---
-    const post = await getPostBySlug(slug);
+    const post = await getPostBySlug(supabase, slug);
     
     if (!post) {
         notFound();
@@ -60,8 +60,8 @@ export default async function PostPage({ params }) {
         { data: allPosts }, // Para "Recomendados"
         similarPostsData    // Para "Similares"
     ] = await Promise.all([
-        getPosts({ section: post.sections?.slug, limit: 10 }), // Trae 10 para elegir aleatorios
-        getRelatedPosts(post.id, post.keywords, 3) // Trae 3 por keywords
+        getPosts(supabase, { section: post.sections?.slug, limit: 10 }), // Trae 10 para elegir aleatorios
+        getRelatedPosts(supabase, post.id, post.keywords, 3) // Trae 3 por keywords
     ]);
 
     // Lógica de "Recomendados" (posts aleatorios de la sección)

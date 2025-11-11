@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { getAllPostStats, getPosts } from '@/app/lib/supabase/posts';
+import { createClient } from '@/app/utils/supabase/client';
+import { getAllPostStats, getPosts } from '@/app/lib/supabase/client';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
 import { BarChart as BarChartIcon, Eye, Download, Search, Filter, TrendingUp, FileText, Hash, Star } from 'lucide-react';
@@ -12,6 +13,8 @@ import { useToast } from '@/app/components/ui/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { format, subDays } from 'date-fns';
 import { es } from 'date-fns/locale';
+
+const supabase = createClient();
 
 const StatCard = ({ title, value, icon, color }) => (
     <div className="glass-effect p-6 rounded-2xl flex items-center justify-between">
@@ -38,10 +41,10 @@ const Analytics = () => {
     const fetchData = useCallback(async () => {
         try {
             const [fetchedStats, postsData, categoriesData, sectionsData] = await Promise.all([
-                getAllPostStats(),
-                getPosts({ limit: 1000 }),
-                getCategories(),
-                getSections(),
+                getAllPostStats(supabase),
+                getPosts(supabase, { limit: 1000 }),
+                getCategories(supabase),
+                getSections(supabase),
             ]);
             setStats(fetchedStats);
             setPosts(postsData.data || []);

@@ -12,7 +12,10 @@ import { DollarSign, Percent, CalendarClock, Save, Book, Trash2, Loader2, Messag
 import { Button } from '@/app/components/ui/button'; // Adjusted path
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog'; // Adjusted path
 import { useToast } from '@/app/components/ui/use-toast'; // Adjusted path
+import { createClient } from '@/app/utils/supabase/client';
 import { getTemplates, saveTemplate, deleteTemplate } from '@/app/lib/supabase/templates'; // Adjusted path
+
+const supabase = createClient();
 
 const PostFormSidebar = ({
     hasDownload, setHasDownload,
@@ -45,7 +48,7 @@ const PostFormSidebar = ({
 
     const fetchTemplates = async () => {
         setIsLoadingTemplates(true);
-        const data = await getTemplates();
+        const data = await getTemplates(supabase);
         setTemplates(data);
         setIsLoadingTemplates(false);
     };
@@ -60,7 +63,7 @@ const PostFormSidebar = ({
             return;
         }
         const templateData = getTemplateData();
-        const { error } = await saveTemplate(newTemplateName, templateData);
+        const { error } = await saveTemplate(supabase, newTemplateName, templateData);
         if (error) {
             toast({ title: 'Error al guardar plantilla', description: error.message, variant: 'destructive' });
         } else {
@@ -72,7 +75,7 @@ const PostFormSidebar = ({
     };
     
     const handleDeleteTemplate = async (templateId) => {
-        const { error } = await deleteTemplate(templateId);
+        const { error } = await deleteTemplate(supabase, templateId);
         if (error) {
             toast({ title: 'Error al eliminar plantilla', variant: 'destructive' });
         } else {

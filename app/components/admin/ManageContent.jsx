@@ -13,7 +13,7 @@ import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 
 import { getPosts, getPendingEdits } from '@/app/lib/supabase/client';
 import { updatePostEditStatusAction } from '@/app/actions/posts';
-import { approveAndPublishEdit } from '@/app/actions/posts';
+import { updatePost } from '@/app/lib/actions/post-actions';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
 import { Button } from '@/app/components/ui/button';
@@ -22,6 +22,9 @@ import { getSubcategories } from '@/app/lib/supabase/subcategories';
 import { Switch } from '@/app/components/ui/switch';
 import { Label } from '@/app/components/ui/label';
 import Link from 'next/link';
+import { createClient } from '@/app/utils/supabase/client';
+
+const supabase = createClient();
 
 const ManageContent = () => {
     const { toast } = useToast();
@@ -48,10 +51,10 @@ const ManageContent = () => {
         setIsLoading(true);
         try {
             const [postsData, categoriesData, sectionsData, subcategoriesData] = await Promise.all([
-                getPosts({ limit: 1000, includeDrafts: true, includePending: true }),
-                getCategories(),
-                getSections(),
-                getSubcategories()
+                getPosts(supabase, { limit: 1000, includeDrafts: true, includePending: true }),
+                getCategories(supabase),
+                getSections(supabase),
+                getSubcategories(supabase)
             ]);
             setPosts(postsData.data || []);
             setCategories(categoriesData || []);
@@ -59,7 +62,7 @@ const ManageContent = () => {
             setSubcategories(subcategoriesData || []);
 
             if (isAdmin) {
-                const edits = await getPendingEdits();
+                const edits = await getPendingEdits(supabase);
                 setPendingEdits(edits);
             }
         } catch (error) {
@@ -78,18 +81,18 @@ const ManageContent = () => {
     };
 
     const handleReview = async (edit, newStatus) => {
-        const { error: updateError } = await updatePostEditStatus(edit.id, newStatus, user.id);
+        const { error: updateError } = await updatePostEditStatusAction(edit.id, newStatus);
         if (updateError) {
             toast({ title: 'Error al revisar la edición', description: updateError.message, variant: 'destructive' });
             return;
         }
 
         if (newStatus === 'approved') {
-            const result = await approveAndPublishEdit(edit);
-            if (!result.success) {
-                toast({ title: 'Error al aplicar y publicar la edición', description: result.error, variant: 'destructive' });
+            const { error: publishError } = await updatePost(edit.post_id, { content: edit.content, status: 'published' });
+            if (publishError) {
+                toast({ title: 'Error al aplicar y publicar la edición', description: publishError.message, variant: 'destructive' });
                 // Revert the status on failure
-                await updatePostEditStatusAction(edit.id, 'pending', null);
+                await updatePostEditStatusAction(edit.id, 'pending');
                 return;
             }
         }

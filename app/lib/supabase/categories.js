@@ -1,9 +1,8 @@
-import { supabase } from '@/app/lib/customSupabaseClient';
 import { logActivity } from '@/app/lib/supabase/log';
 
 // This comment is added to force a re-transpilation/re-evaluation of this module.
 
-export const getCategories = async (options = {}) => {
+export const getCategories = async (supabase, options = {}) => {
     const { sectionId } = options;
     
     let query = supabase
@@ -24,20 +23,20 @@ export const getCategories = async (options = {}) => {
     return data;
 };
 
-export const addCategory = async (categoryData) => {
+export const addCategory = async (supabase, categoryData) => {
     const { data, error } = await supabase
         .from('categories')
         .insert([categoryData])
         .select();
     
     if (!error) {
-        logActivity(`Admin creó una nueva categoría: "${categoryData.name}"`);
+        await logActivity(supabase, `Admin creó una nueva categoría: "${categoryData.name}"`);
     }
 
     return { data, error };
 };
 
-export const updateCategory = async (categoryId, categoryData) => {
+export const updateCategory = async (supabase, categoryId, categoryData) => {
     const { data, error } = await supabase
         .from('categories')
         .update(categoryData)
@@ -45,13 +44,13 @@ export const updateCategory = async (categoryId, categoryData) => {
         .select();
 
     if (!error) {
-        logActivity(`Admin actualizó la categoría: "${categoryData.name}"`, { categoryId });
+        await logActivity(supabase, `Admin actualizó la categoría: "${categoryData.name}"`, { categoryId });
     }
 
     return { data, error };
 };
 
-export const deleteCategory = async (categoryId, categoryName) => {
+export const deleteCategory = async (supabase, categoryId, categoryName) => {
     const { error } = await supabase
         .from('categories')
         .delete()
@@ -60,7 +59,7 @@ export const deleteCategory = async (categoryId, categoryName) => {
     return { error };
 };
 
-export const getPostCountForCategory = async (categoryId) => {
+export const getPostCountForCategory = async (supabase, categoryId) => {
     const { count, error } = await supabase
         .from('posts')
         .select('*', { count: 'exact', head: true })
@@ -74,7 +73,7 @@ export const getPostCountForCategory = async (categoryId) => {
     return count;
 };
 
-export const reassignPostsCategory = async (oldCategoryId, newCategoryId) => {
+export const reassignPostsCategory = async (supabase, oldCategoryId, newCategoryId) => {
     const { data, error } = await supabase
         .from('posts')
         .update({ category_id: newCategoryId })

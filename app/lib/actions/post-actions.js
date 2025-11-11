@@ -1,30 +1,19 @@
-// IMPORTANTE: Esta línea le dice a Next.js que todo aquí es CÓDIGO DE SERVIDOR.
 "use server";
 
-import { supabase } from '@/app/lib/customSupabaseClient';
+import { createClient } from '@/app/utils/supabase/server';
 import { logActivity } from '@/app/lib/supabase/log';
 import { sendSuperadminNotificationEmail } from '@/app/lib/supabase/email';
 import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom'; // <-- ¡LA IMPORTACIÓN QUE FALTABA!
+import { JSDOM } from 'jsdom';
 
-// --- Server-side HTML Sanitization ---
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
 const sanitizeContent = (html) => {
     if (!html) return null;
-
-    // Configuration is strict by default. We add what's needed.
     const sanitized = DOMPurify.sanitize(html, {
-        ADD_TAGS: [
-            'iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div',
-            'h1', 'h2', 'h3', 'p', 'b', 'i', 'u', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'img', 'br', 'blockquote', 'span'
-        ],
-        ADD_ATTR: [
-            'style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 
-            'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title',
-            'data-align', 'data-youtube-video', 'href', 'alt', 'target', 'rel'
-        ],
+        ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div', 'h1', 'h2', 'h3', 'p', 'b', 'i', 'u', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'img', 'br', 'blockquote', 'span'],
+        ADD_ATTR: ['style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title', 'data-align', 'data-youtube-video', 'href', 'alt', 'target', 'rel'],
         FORBID_TAGS: [],
         FORBID_ATTR: [],
         ADD_HOOKS: {
@@ -34,9 +23,7 @@ const sanitizeContent = (html) => {
                     if (src) {
                         try {
                             const url = new URL(src);
-                            if (url.hostname !== 'www.youtube.com' 
-                                && url.hostname !== 'youtube.com' && 
-                                url.hostname !== 'www.youtube-nocookie.com') {
+                            if (url.hostname !== 'www.youtube.com' && url.hostname !== 'youtube.com' && url.hostname !== 'www.youtube-nocookie.com') {
                                 node.removeAttribute('src');
                             }
                         } catch (e) {
@@ -50,11 +37,8 @@ const sanitizeContent = (html) => {
     return sanitized;
 };
 
-
-// --- Funciones de "Escritura" (Mutaciones) ---
-
 export const addPost = async (postData) => {
-    // Sanitize content before inserting
+    const supabase = createClient();
     const sanitizedPostData = {
         ...postData,
         content: sanitizeContent(postData.content)
@@ -71,15 +55,16 @@ export const addPost = async (postData) => {
     }
     
     if (data && data.length > 0 && sanitizedPostData.status === 'published') {
-        logActivity(`Usuario creó un nuevo recurso: "${sanitizedPostData.title}"`, { status: sanitizedPostData.status, postId: data[0].id });
+        await logActivity(supabase, `Usuario creó un nuevo recurso: "${sanitizedPostData.title}"`, { status: sanitizedPostData.status, postId: data[0].id });
         const postUrl = `/blog/${data[0].slug}`;
-        await sendSuperadminNotificationEmail(sanitizedPostData.title, postUrl);
+        await sendSuperadminNotificationEmail(supabase, sanitizedPostData.title, postUrl);
     }
 
     return { data, error: null };
 };
 
 export const updatePost = async (postId, postData) => {
+    const supabase = createClient();
     const { data: existingPost, error: fetchError } = await supabase
         .from('posts')
         .select('status')
@@ -90,7 +75,6 @@ export const updatePost = async (postId, postData) => {
         console.error('Error fetching post for status check:', fetchError);
     }
 
-    // Sanitize content before updating, if it exists
     const sanitizedPostData = { ...postData };
     if (postData.content) {
         sanitizedPostData.content = sanitizeContent(postData.content);
@@ -108,17 +92,18 @@ export const updatePost = async (postId, postData) => {
     }
 
     if (existingPost && existingPost.status !== 'published' && sanitizedPostData.status === 'published') {
-        logActivity(`Usuario actualizó el recurso: "${sanitizedPostData.title}"`, { postId, changes: Object.keys(sanitizedPostData) });
+        await logActivity(supabase, `Usuario actualizó el recurso: "${sanitizedPostData.title}"`, { postId, changes: Object.keys(sanitizedPostData) });
         const postUrl = `/blog/${data[0].slug}`;
-        await sendSuperadminNotificationEmail(sanitizedPostData.title, postUrl);
+        await sendSuperadminNotificationEmail(supabase, sanitizedPostData.title, postUrl);
     } else if (existingPost && existingPost.status === 'published' && sanitizedPostData.status === 'published') {
-        logActivity(`Usuario actualizó el recurso: "${sanitizedPostData.title}"`, { postId, changes: Object.keys(sanitizedPostData) });
+        await logActivity(supabase, `Usuario actualizó el recurso: "${sanitizedPostData.title}"`, { postId, changes: Object.keys(sanitizedPostData) });
     }
 
     return { data, error: null };
 };
 
 export const addPostEdit = async (editData) => {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('post_edits')
         .insert([editData])
@@ -128,6 +113,7 @@ export const addPostEdit = async (editData) => {
 };
 
 export const getPendingEdits = async () => {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('post_edits')
         .select(`*, posts (title, slug), editor_id`)
@@ -143,6 +129,7 @@ export const getPendingEdits = async () => {
 };
 
 export const updatePostEditStatus = async (editId, status, reviewerId) => {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('post_edits')
         .update({ status, reviewed_at: new Date(), reviewer_id: reviewerId })
@@ -154,6 +141,7 @@ export const updatePostEditStatus = async (editId, status, reviewerId) => {
 };
 
 export const deletePost = async (postId, postTitle, shouldLog = true) => {
+    const supabase = createClient();
     const { data: existingPost, error: fetchError } = await supabase
         .from('posts')
         .select('status')
@@ -170,13 +158,14 @@ export const deletePost = async (postId, postTitle, shouldLog = true) => {
         .eq('id', postId);
 
     if (!error && shouldLog && existingPost && existingPost.status === 'published') {
-        logActivity(`Usuario eliminó el recurso: "${postTitle}"`, { postId });
+        await logActivity(supabase, `Usuario eliminó el recurso: "${postTitle}"`, { postId });
     }
 
     return { error };
 };
 
 export const incrementPostStat = async (postId, statType) => {
+    const supabase = createClient();
     if (!postId || !statType) return;
     const { error } = await supabase.rpc('increment_post_stat', { 
         post_id_to_update: postId, 

@@ -2,10 +2,13 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import PostForm from '@/app/components/admin/PostForm';
+import { createClient } from '@/app/utils/supabase/client';
 import { getSections } from '@/app/lib/supabase/sections';
-import { addPost } from '@/app/lib/supabase/posts';
+import { addPost } from '@/app/lib/actions/post-actions';
 import { useToast } from '@/app/components/ui/use-toast';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
+
+const supabase = createClient();
 
 const AddResourcePage = () => {
     const { user } = useAuth();
@@ -13,7 +16,7 @@ const AddResourcePage = () => {
     const [sections, setSections] = useState([]);
 
     const fetchData = useCallback(async () => {
-        const sectionsData = await getSections();
+        const sectionsData = await getSections(supabase);
         setSections(sectionsData || []);
     }, []);
 

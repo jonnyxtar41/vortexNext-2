@@ -4,18 +4,12 @@ import { getPosts } from '@/app/lib/supabase/client';
 import PostListPage from '@/app/components/PostListPage';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-// Importamos el cliente de Supabase para hacer consultas de taxonomía
-import { supabase } from '@/app/lib/customSupabaseClient'; 
+import { createClient } from '@/app/utils/supabase/server';
 
 const POSTS_PER_PAGE = 9;
 
-/**
- * --- Lógica de Taxonomía Dinámica ---
- * Estas son las funciones que faltaban.
- * Consultan la BD para obtener los detalles de la sección, categoría y subcategoría
- * basándose en los slugs de la URL.
- */
 async function getTaxonomyData(slugArray) {
+    const supabase = createClient();
     const [sectionSlug, categorySlug, subcategorySlug] = slugArray;
 
     let section, category, subcategory;
@@ -127,6 +121,7 @@ export async function generateMetadata({ params, searchParams }) {
 
 // --- El Componente Page (Server Component) ---
 export default async function DynamicPostListPage({ params, searchParams }) {
+    const supabase = createClient();
     
     const slugArray = params.slug || [];
     
@@ -181,7 +176,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     }
 
     // 4. Llama a getPosts con los parámetros correctos
-    const { data: posts, count: totalPosts } = await getPosts(postParams);
+    const { data: posts, count: totalPosts } = await getPosts(supabase, postParams);
 
 
     const totalPages = Math.ceil((totalPosts || 0) / POSTS_PER_PAGE);

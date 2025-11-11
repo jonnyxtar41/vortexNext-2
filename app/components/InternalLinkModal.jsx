@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/app/lib/customSupabaseClient';
+import { createClient } from '@/app/utils/supabase/client';
 import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog';
 import { Search } from 'lucide-react';
+
+const supabase = createClient();
 
 const InternalLinkModal = ({ open, onOpenChange, onSelectPost }) => {
   const [searchTerm, setSearchTerm] = useState('');

@@ -4,13 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, FileText, Hash, Folder, Users, PlusSquare, Edit, BarChart, DollarSign, MessageSquare, BookOpen, Globe } from 'lucide-react';
-import { supabase } from '@/app/lib/customSupabaseClient';
+import { createClient } from '@/app/utils/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { getPosts } from '@/app/lib/supabase/client';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
+
+const supabase = createClient();
 
 const StatCard = ({ title, value, icon, color }) => (
     <div className="glass-effect p-4 md:p-6 rounded-2xl flex items-center justify-between">
@@ -87,9 +89,9 @@ const Dashboard = () => {
             setSuggestions(suggestionsData || []);
 
             const [postsData, categoriesData, sectionsData] = await Promise.all([
-                getPosts({ includeDrafts: true, includePending: true, limit: 1000 }),
-                getCategories(),
-                getSections(),
+                getPosts(supabase, { includeDrafts: true, includePending: true, limit: 1000 }),
+                getCategories(supabase),
+                getSections(supabase),
             ]);
             setPosts(postsData.data || []);
             setCategories(categoriesData || []);

@@ -1,6 +1,4 @@
-import { supabase } from '@/app/lib/customSupabaseClient';
-
-export const getCommentsByPostId = async (postId) => {
+export const getCommentsByPostId = async (supabase, postId) => {
     if (!postId) return [];
 
     const { data, error } = await supabase
@@ -43,7 +41,7 @@ export const getCommentsByPostId = async (postId) => {
     return data;
 };
 
-export const addComment = async (commentData) => {
+export const addComment = async (supabase, commentData) => {
     const { data: { user } } = await supabase.auth.getUser();
 
     const { data, error } = await supabase

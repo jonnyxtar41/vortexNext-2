@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/app/components/ui/use-toast';
-import { getPayments, getAllSiteContent, updateSiteContent } from '@/app/lib/supabase/siteContent';
+import { createClient } from '@/app/utils/supabase/client';
+import { getPayments, getAllSiteContent, updateSiteContent } from '@/app/lib/supabase/client';
 import { DollarSign, CheckCircle, XCircle, Clock, Save, CreditCard, Info, Heart, Filter, Download, Repeat, MessageSquare, Banknote, Bitcoin } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -15,6 +16,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert";
 import { Textarea } from '@/app/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { Switch } from '@/app/components/ui/switch';
+
+const supabase = createClient();
 
 const ManagePayments = () => {
     const { toast } = useToast();
@@ -54,8 +57,8 @@ const ManagePayments = () => {
         setLoadingConfig(true);
         try {
             const [paymentsData, siteContentData] = await Promise.all([
-                getPayments(),
-                getAllSiteContent()
+                getPayments(supabase),
+                getAllSiteContent(supabase)
             ]);
             setPayments(paymentsData);
             
@@ -104,7 +107,7 @@ const ManagePayments = () => {
 
             await Promise.all(
                 Object.entries(configToSave).map(([key, value]) => 
-                    updateSiteContent(key, String(value))
+                    updateSiteContent(supabase, key, String(value))
                 )
             );
             toast({
@@ -121,7 +124,6 @@ const ManagePayments = () => {
             setLoadingConfig(false);
         }
     };
-
     const filteredPayments = useMemo(() => {
         return payments.filter(p => {
             const providerMatch = filters.provider === 'all' || p.payment_provider.toLowerCase() === filters.provider;

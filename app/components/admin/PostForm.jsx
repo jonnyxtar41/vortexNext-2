@@ -23,8 +23,10 @@ import { getPosts } from '@/app/lib/supabase/client'; // Adjusted path
 import { deletePostAction } from '@/app/actions/posts'; 
 import { uploadDownloadableAsset } from '@/app/lib/supabase/assets'; // Adjusted path
 import { Textarea } from '@/app/components/ui/textarea'; // Adjusted path
-import { supabase } from '@/app/lib/customSupabaseClient'; // Adjusted path
+import { createClient } from '@/app/utils/supabase/client'; // Adjusted path
 import InternalLinkModal from '@/app/components/InternalLinkModal'; // Adjusted path
+
+const supabase = createClient();
 
 const PostForm = ({ sections, onSave, onNewPost, initialData = {}, onUpdate }) => {
     
@@ -116,7 +118,7 @@ const PostForm = ({ sections, onSave, onNewPost, initialData = {}, onUpdate }) =
         toast({ title: '🤖 Buscando sugerencias de enlaces...' });
 
         try {
-            const { data: allPosts } = await getPosts({ limit: 1000, includeDrafts: false, includePending: false });
+            const { data: allPosts } = await getPosts(supabase, { limit: 1000, includeDrafts: false, includePending: false });
             if (!allPosts) throw new Error("No se pudieron obtener los posts existentes.");
 
             const postTitles = allPosts.map(p => ({ title: p.title, url: `/${p.sections?.slug || 'blog'}/${p.slug}` }));
@@ -360,7 +362,7 @@ DEVUELVE ÚNICAMENTE una lista de palabras clave separadas por comas (formato CS
             if (downloadType === 'file' && downloadFile) {
                 setIsUploading(true);
                 toast({ title: "Subiendo archivo..." });
-                const uploadedUrl = await uploadDownloadableAsset(downloadFile);
+                const uploadedUrl = await uploadDownloadableAsset(supabase, downloadFile);
                 setIsUploading(false);
                 if (!uploadedUrl) {
                     toast({ title: "❌ Error al subir el archivo", variant: "destructive" });
@@ -415,7 +417,7 @@ DEVUELVE ÚNICAMENTE una lista de palabras clave separadas por comas (formato CS
     useEffect(() => {
         const fetchCategories = async () => {
             if (postSectionId) {
-                const categoriesData = await getCategories({ sectionId: postSectionId });
+                const categoriesData = await getCategories(supabase, { sectionId: postSectionId });
                 setAvailableCategories(categoriesData);
             } else {
                 setAvailableCategories([]);
@@ -427,7 +429,7 @@ DEVUELVE ÚNICAMENTE una lista de palabras clave separadas por comas (formato CS
     useEffect(() => {
         const fetchSubcategories = async () => {
             if (postCategoryId) {
-                const subcategoriesData = await getSubcategories({ categoryId: postCategoryId });
+                const subcategoriesData = await getSubcategories(supabase, { categoryId: postCategoryId });
                 setAvailableSubcategories(subcategoriesData);
             } else {
                 setAvailableSubcategories([]);

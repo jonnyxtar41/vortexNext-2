@@ -1,6 +1,4 @@
-import { supabase } from '@/app/lib/customSupabaseClient';
-
-export const sendSuperadminNotificationEmail = async (postTitle, postUrl) => {
+export const sendSuperadminNotificationEmail = async (supabase, postTitle, postUrl) => {
     try {
         // In a real application, you would call a Supabase Edge Function here.
         // This Edge Function would then use a service like SendGrid, Mailgun, or Resend

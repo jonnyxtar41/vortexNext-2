@@ -1,6 +1,5 @@
-import { supabase } from '@/app/lib/customSupabaseClient';
 
-export const listSiteAssets = async () => {
+export const listSiteAssets = async (supabase) => {
     const { data, error } = await supabase.storage
         .from('site-assets')
         .list('post-main-images', { // List files from the 'post-main-images' subfolder
@@ -12,7 +11,7 @@ export const listSiteAssets = async () => {
     return { data, error };
 };
 
-export const deleteSiteAsset = async (assetNames) => {
+export const deleteSiteAsset = async (supabase, assetNames) => {
     const subfolder = 'post-main-images';
     let pathsToDelete = [];
 
@@ -29,7 +28,7 @@ export const deleteSiteAsset = async (assetNames) => {
     return { data, error };
 };
 
-export const uploadSiteAsset = async (file, path) => {
+export const uploadSiteAsset = async (supabase, file, path) => {
     const { data, error } = await supabase.storage
       .from('site-assets')
       .upload(path, file, {
@@ -49,7 +48,7 @@ export const uploadSiteAsset = async (file, path) => {
     return publicUrlData.publicUrl;
 };
 
-export const uploadDownloadableAsset = async (file) => {
+export const uploadDownloadableAsset = async (supabase, file) => {
     if (!file) return null;
 
     const fileExt = file.name.split('.').pop();
@@ -72,7 +71,7 @@ export const uploadDownloadableAsset = async (file) => {
     return publicUrlData.publicUrl;
 };
 
-export const uploadPostImage = async (file) => {
+export const uploadPostImage = async (supabase, file) => {
     if (!file) return null;
 
     const fileExt = file.name.split('.').pop();
@@ -98,7 +97,7 @@ export const uploadPostImage = async (file) => {
     return publicUrlData.publicUrl;
 };
 
-export const uploadBase64Image = async (dataUrl, folder = 'post-main-images') => {
+export const uploadBase64Image = async (supabase, dataUrl, folder = 'post-main-images') => {
     if (!dataUrl) return null;
 
     // Extract MIME type and base64 data

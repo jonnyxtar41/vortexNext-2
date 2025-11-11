@@ -1,6 +1,4 @@
-import { supabase } from '@/app/lib/customSupabaseClient';
-
-export const logActivity = async (action, details = null) => {
+export const logActivity = async (supabase, action, details = null) => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
         
