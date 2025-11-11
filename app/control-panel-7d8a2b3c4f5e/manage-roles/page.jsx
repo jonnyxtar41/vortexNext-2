@@ -7,10 +7,8 @@ import { Input } from '@/app/components/ui/input';
 import { Trash2, Plus, Save } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog";
 
-// 1. Importamos 'createClient' como lo hace tu AuthContext
 import { createClient } from '@/app/utils/supabase/client';
 
-// 2. Creamos la instancia del cliente UNA SOLA VEZ fuera del componente
 const supabase = createClient();
 
 const ManageRoles = () => {
@@ -23,7 +21,6 @@ const ManageRoles = () => {
     const [editingRole, setEditingRole] = useState(null);
     const [permissions, setPermissions] = useState({});
     
-    // Lista de permisos (idéntica a Vite)
     const allPermissions = [
         'dashboard', 'add-resource', 'manage-content', 'can_publish_posts',
         'analytics', 'payments', 'manage-users', 'manage-roles', 'manage-theme',
@@ -31,110 +28,113 @@ const ManageRoles = () => {
         'manage-suggestions', 'activity-log', 'credentials'
     ];
 
-    // Lógica de fetching (idéntica a Vite)
+    // --- CORREGIDO (Lógica de Objeto) ---
     const fetchRolesAndPermissions = useCallback(async () => {
         setLoading(true);
-        const { data: rolesData, error: rolesError } = await supabase.from('roles').select('*');
-        const { data: permsData, error: permsError } = await supabase.from('role_permissions').select('*');
+        const { data: rolesData, error: rolesError } = await supabase.from('roles').select('id, name, permissions');
 
         if (rolesError) {
             toast({ title: "Error al cargar roles", description: rolesError.message, variant: "destructive" });
         } else {
             setRoles(rolesData || []);
-        }
-
-        if (permsError) {
-            toast({ title: "Error al cargar permisos", description: permsError.message, variant: "destructive" });
-        } else {
-            const permsByRole = (permsData || []).reduce((acc, perm) => {
-                if (!acc[perm.role_id]) {
-                    acc[perm.role_id] = {};
-                }
-                acc[perm.role_id][perm.permission_name] = true;
+            
+            // Construimos el objeto de permisos
+            const permsByRole = (rolesData || []).reduce((acc, role) => {
+                // role.permissions es un objeto (ej: { "dashboard": true }) o null
+                // Ya no necesitamos .reduce(), solo asignamos el objeto
+                acc[role.id] = role.permissions || {}; // <-- ESTA ES LA CORRECCIÓN
                 return acc;
             }, {});
             setPermissions(permsByRole);
         }
         
         setLoading(false);
-    }, [supabase, toast]); // 'supabase' es una dependencia correcta
+    }, [supabase, toast]);
 
     useEffect(() => {
         fetchRolesAndPermissions();
     }, [fetchRolesAndPermissions]);
 
-    // Lógica de añadir rol (idéntica a Vite)
+    // --- CORREGIDO (Lógica de Objeto) ---
     const handleAddNewRole = async () => {
         if (!newRoleName.trim()) {
             toast({ title: "Nombre inválido", description: "El nombre del rol no puede estar vacío.", variant: "destructive" });
             return;
         }
 
-        const { data, error } = await supabase.from('roles').insert({ name: newRoleName }).select().single();
+        const { data, error } = await supabase
+            .from('roles')
+            .insert({ 
+                name: newRoleName,
+                permissions: {} // <-- CORRECCIÓN: Insertamos un objeto vacío
+            })
+            .select()
+            .single();
+
         if (error) {
             console.error("Error creating role:", JSON.stringify(error, null, 2));
             toast({ title: "Error al crear rol", description: error.message, variant: "destructive" });
         } else {
             toast({ title: "✅ Rol Creado", description: `El rol "${newRoleName}" ha sido añadido.` });
             setRoles([...roles, data]);
+            setPermissions(prev => ({ ...prev, [data.id]: {} }));
             setNewRoleName('');
         }
     };
 
-    // Lógica de eliminar rol (idéntica a Vite)
+    // --- (Esta función ya era correcta) ---
     const handleDeleteRole = async () => {
         if (!deleteCandidate) return;
 
-        const { error: permError } = await supabase.from('role_permissions').delete().eq('role_id', deleteCandidate.id);
-        if (permError) {
-            toast({ title: "Error al eliminar permisos", description: permError.message, variant: "destructive" });
-            setDeleteCandidate(null);
-            return;
-        }
-
-        const { error: roleError } = await supabase.from('roles').delete().eq('id', deleteCandidate.id);
+        const { error: roleError } = await supabase
+            .from('roles')
+            .delete()
+            .eq('id', deleteCandidate.id);
+        
         if (roleError) {
             toast({ title: "Error al eliminar rol", description: roleError.message, variant: "destructive" });
         } else {
             toast({ title: "🗑️ Rol eliminado", description: "El rol ha sido eliminado." });
             setRoles(roles.filter(r => r.id !== deleteCandidate.id));
+            setPermissions(prev => {
+                const newPerms = { ...prev };
+                delete newPerms[deleteCandidate.id];
+                return newPerms;
+            });
         }
         setDeleteCandidate(null);
     };
 
-    // Lógica de guardar permisos (idéntica a Vite)
+    // --- CORREGIDO (Lógica de Objeto) ---
     const handleSavePermissions = async (roleId) => {
+        // 1. Obtenemos el objeto del estado (ej: { dashboard: true, analytics: false })
         const rolePerms = permissions[roleId] || {};
 
-        const { error: deleteError } = await supabase.from('role_permissions').delete().eq('role_id', roleId);
-        if (deleteError) {
-            toast({ title: "Error al guardar (Paso 1)", description: deleteError.message, variant: "destructive" });
+        // 2. Creamos un *nuevo* objeto que solo contenga las keys con valor 'true'
+        const permsToUpdate = Object.keys(rolePerms)
+            .filter(perm => rolePerms[perm]) // Filtramos los que son 'true'
+            .reduce((acc, perm) => {
+                acc[perm] = true; // Construimos el objeto (ej: { dashboard: true })
+                return acc;
+            }, {});
+
+        // 3. Actualizamos la BBDD con este nuevo objeto
+        const { error } = await supabase
+            .from('roles')
+            .update({ permissions: permsToUpdate }) // <-- CORRECCIÓN: Guardamos el objeto
+            .eq('id', roleId);
+
+        if (error) {
+            toast({ title: "Error al guardar permisos", description: error.message, variant: "destructive" });
             return;
-        }
-
-        const permsToInsert = Object.keys(rolePerms)
-            .filter(perm => rolePerms[perm]) 
-            .map(permName => ({
-                role_id: roleId,
-                permission_name: permName
-            }));
-
-        if (permsToInsert.length > 0) {
-            const { error: insertError } = await supabase.from('role_permissions').insert(permsToInsert);
-            if (insertError) {
-                toast({ title: "Error al guardar (Paso 2)", description: insertError.message, variant: "destructive" });
-                return;
-            }
         }
 
         toast({ title: "✅ Permisos Guardados", description: "Los permisos para este rol han sido actualizados." });
         setEditingRole(null);
-        // Recargamos para asegurarnos (Vite lo hacía, aunque no era 100% necesario si el estado local se maneja bien)
         fetchRolesAndPermissions(); 
     };
 
-    // --- ESTA ES LA LÓGICA CLAVE QUE FALTABA O FALLABA ---
-    // Lógica de 'toggle' (idéntica a Vite)
+    // --- (Esta función ya era correcta) ---
     const togglePermission = (roleId, permName) => {
         setPermissions(prev => ({
             ...prev,
@@ -144,7 +144,6 @@ const ManageRoles = () => {
             }
         }));
     };
-    // -----------------------------------------------------
 
     if (loading) {
         return <div className="flex justify-center items-center h-64">Cargando roles y permisos...</div>;
@@ -192,7 +191,6 @@ const ManageRoles = () => {
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel onClick={() => setDeleteCandidate(null)}>Cancelar</AlertDialogCancel>
-                                                {/* CORRECCIÓN DE TIPO: </AlertDialogAction> */}
                                                 <AlertDialogAction onClick={handleDeleteRole}>Eliminar</AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
@@ -207,7 +205,6 @@ const ManageRoles = () => {
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                                     {allPermissions.map(permName => (
                                         <label key={permName} className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-muted/50 cursor-pointer">
-                                            {/* El 'checked' y 'onChange' son idénticos a Vite */}
                                             <input 
                                                 type="checkbox"
                                                 className="form-checkbox h-4 w-4 rounded bg-background text-primary border-border focus:ring-primary"
