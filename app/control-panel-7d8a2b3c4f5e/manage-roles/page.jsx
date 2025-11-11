@@ -1,196 +1,233 @@
-'use client';
+'use client'; 
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/app/lib/customSupabaseClient';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { useToast } from '@/app/components/ui/use-toast';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
-import { Checkbox } from '@/app/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/app/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/app/components/ui/alert-dialog';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Trash2, Plus, Save } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog";
 
-const permissionsMap = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'add-resource', label: 'Añadir Recurso' },
-    { id: 'manage-content', label: 'Gestionar Contenido' },
-    { id: 'analytics', label: 'Estadísticas' },
-    { id: 'payments', label: 'Monetización' },
-    { id: 'manage-users', label: 'Gestionar Usuarios' },
-    { id: 'manage-theme', label: 'Gestionar Tema' },
-    { id: 'manage-site-content', label: 'Contenido del Sitio' },
-    { id: 'manage-ads', label: 'Gestionar Anuncios' },
-    { id: 'manage-assets', label: 'Gestionar Archivos' },
-    { id: 'manage-resources', label: 'Herramientas de Recursos' },
-    { id: 'manage-suggestions', label: 'Sugerencias' },
-    { id: 'activity-log', label: 'Registro de Actividad' },
-    { id: 'credentials', label: 'Credenciales' },
-    { id: 'manage-roles', label: 'Gestionar Roles' },
-    { id: 'can_publish_posts', label: 'Puede publicar posts' },
-];
+// 1. Importamos 'createClient' como lo hace tu AuthContext
+import { createClient } from '@/app/utils/supabase/client';
 
 const ManageRoles = () => {
+    // 2. Creamos la instancia del cliente
+    const supabase = createClient();
+    
     const { toast } = useToast();
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [isDialogOpen, setDialogOpen] = useState(false);
-    const [editingRole, setEditingRole] = useState(null);
-    const [roleName, setRoleName] = useState('');
-    const [permissions, setPermissions] = useState({});
+    const [newRoleName, setNewRoleName] = useState('');
     const [deleteCandidate, setDeleteCandidate] = useState(null);
+    const [editingRole, setEditingRole] = useState(null);
+    const [permissions, setPermissions] = useState({});
+    
+    // Lista de permisos (idéntica a Vite)
+    const allPermissions = [
+        'dashboard', 'add-resource', 'manage-content', 'can_publish_posts',
+        'analytics', 'payments', 'manage-users', 'manage-roles', 'manage-theme',
+        'manage-site-content', 'manage-ads', 'manage-assets', 'manage-resources',
+        'manage-suggestions', 'activity-log', 'credentials'
+    ];
 
-    const fetchRoles = useCallback(async () => {
+    // Lógica de fetching (idéntica a Vite)
+    const fetchRolesAndPermissions = useCallback(async () => {
         setLoading(true);
-        try {
-            const { data, error } = await supabase.from('roles').select('*');
-            if (error) throw error;
-            setRoles(data);
-        } catch (error) {
-            toast({ title: 'Error al cargar roles', description: error.message, variant: 'destructive' });
-        } finally {
-            setLoading(false);
+        const { data: rolesData, error: rolesError } = await supabase.from('roles').select('*');
+        const { data: permsData, error: permsError } = await supabase.from('role_permissions').select('*');
+
+        if (rolesError) {
+            toast({ title: "Error al cargar roles", description: rolesError.message, variant: "destructive" });
+        } else {
+            setRoles(rolesData || []);
         }
-    }, [toast]);
+
+        if (permsError) {
+            toast({ title: "Error al cargar permisos", description: permsError.message, variant: "destructive" });
+        } else {
+            const permsByRole = (permsData || []).reduce((acc, perm) => {
+                if (!acc[perm.role_id]) {
+                    acc[perm.role_id] = {};
+                }
+                acc[perm.role_id][perm.permission_name] = true;
+                return acc;
+            }, {});
+            setPermissions(permsByRole);
+        }
+        
+        setLoading(false);
+    }, [supabase, toast]); // 'supabase' es una dependencia correcta
 
     useEffect(() => {
-        fetchRoles();
-    }, [fetchRoles]);
+        fetchRolesAndPermissions();
+    }, [fetchRolesAndPermissions]);
 
-    const handleOpenDialog = (role = null) => {
-        setEditingRole(role);
-        if (role) {
-            setRoleName(role.name);
-            setPermissions(role.permissions);
-        } else {
-            setRoleName('');
-            const initialPermissions = permissionsMap.reduce((acc, p) => ({ ...acc, [p.id]: false }), {});
-            setPermissions(initialPermissions);
-        }
-        setDialogOpen(true);
-    };
-
-    const handlePermissionChange = (permissionId) => {
-        setPermissions(prev => ({ ...prev, [permissionId]: !prev[permissionId] }));
-    };
-
-    const handleSubmit = async () => {
-        if (!roleName) {
-            toast({ title: 'Nombre de rol requerido', variant: 'destructive' });
+    // Lógica de añadir rol (idéntica a Vite)
+    const handleAddNewRole = async () => {
+        if (!newRoleName.trim()) {
+            toast({ title: "Nombre inválido", description: "El nombre del rol no puede estar vacío.", variant: "destructive" });
             return;
         }
 
-        try {
-            if (editingRole) {
-                const { error } = await supabase.from('roles').update({ name: roleName, permissions }).eq('id', editingRole.id);
-                if (error) throw error;
-                toast({ title: 'Rol actualizado' });
-            } else {
-                const { error } = await supabase.from('roles').insert({ name: roleName, permissions });
-                if (error) throw error;
-                toast({ title: 'Rol creado' });
-            }
-            setDialogOpen(false);
-            fetchRoles();
-        } catch (error) {
-            toast({ title: 'Error al guardar el rol', description: error.message, variant: 'destructive' });
+        const { data, error } = await supabase.from('roles').insert({ name: newRoleName }).select().single();
+        if (error) {
+            toast({ title: "Error al crear rol", description: error.message, variant: "destructive" });
+        } else {
+            toast({ title: "✅ Rol Creado", description: `El rol "${newRoleName}" ha sido añadido.` });
+            setRoles([...roles, data]);
+            setNewRoleName('');
         }
     };
 
-    const handleDelete = async () => {
+    // Lógica de eliminar rol (idéntica a Vite)
+    const handleDeleteRole = async () => {
         if (!deleteCandidate) return;
-        try {
-            const { count, error: countError } = await supabase.from('user_roles').select('*', { count: 'exact', head: true }).eq('role_id', deleteCandidate.id);
-            if (countError) throw countError;
-            if (count > 0) {
-                toast({ title: 'No se puede eliminar', description: `Hay ${count} usuarios con este rol.`, variant: 'destructive' });
-                setDeleteCandidate(null);
+
+        const { error: permError } = await supabase.from('role_permissions').delete().eq('role_id', deleteCandidate.id);
+        if (permError) {
+            toast({ title: "Error al eliminar permisos", description: permError.message, variant: "destructive" });
+            setDeleteCandidate(null);
+            return;
+        }
+
+        const { error: roleError } = await supabase.from('roles').delete().eq('id', deleteCandidate.id);
+        if (roleError) {
+            toast({ title: "Error al eliminar rol", description: roleError.message, variant: "destructive" });
+        } else {
+            toast({ title: "🗑️ Rol eliminado", description: "El rol ha sido eliminado." });
+            setRoles(roles.filter(r => r.id !== deleteCandidate.id));
+        }
+        setDeleteCandidate(null);
+    };
+
+    // Lógica de guardar permisos (idéntica a Vite)
+    const handleSavePermissions = async (roleId) => {
+        const rolePerms = permissions[roleId] || {};
+
+        const { error: deleteError } = await supabase.from('role_permissions').delete().eq('role_id', roleId);
+        if (deleteError) {
+            toast({ title: "Error al guardar (Paso 1)", description: deleteError.message, variant: "destructive" });
+            return;
+        }
+
+        const permsToInsert = Object.keys(rolePerms)
+            .filter(perm => rolePerms[perm]) 
+            .map(permName => ({
+                role_id: roleId,
+                permission_name: permName
+            }));
+
+        if (permsToInsert.length > 0) {
+            const { error: insertError } = await supabase.from('role_permissions').insert(permsToInsert);
+            if (insertError) {
+                toast({ title: "Error al guardar (Paso 2)", description: insertError.message, variant: "destructive" });
                 return;
             }
-
-            const { error } = await supabase.from('roles').delete().eq('id', deleteCandidate.id);
-            if (error) throw error;
-            toast({ title: 'Rol eliminado' });
-            fetchRoles();
-        } catch (error) {
-            toast({ title: 'Error al eliminar el rol', description: error.message, variant: 'destructive' });
-        } finally {
-            setDeleteCandidate(null);
         }
+
+        toast({ title: "✅ Permisos Guardados", description: "Los permisos para este rol han sido actualizados." });
+        setEditingRole(null);
+        // Recargamos para asegurarnos (Vite lo hacía, aunque no era 100% necesario si el estado local se maneja bien)
+        fetchRolesAndPermissions(); 
     };
 
+    // --- ESTA ES LA LÓGICA CLAVE QUE FALTABA O FALLABA ---
+    // Lógica de 'toggle' (idéntica a Vite)
+    const togglePermission = (roleId, permName) => {
+        setPermissions(prev => ({
+            ...prev,
+            [roleId]: {
+                ...prev[roleId],
+                [permName]: !prev[roleId]?.[permName] // Alterna el valor
+            }
+        }));
+    };
+    // -----------------------------------------------------
+
+    if (loading) {
+        return <div className="flex justify-center items-center h-64">Cargando roles y permisos...</div>;
+    }
+
     return (
-        <div>
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-bold">Gestionar Roles</h2>
-                <Button onClick={() => handleOpenDialog()}><Plus className="mr-2 h-4 w-4" /> Añadir Rol</Button>
+        <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold mb-6">Gestionar Roles y Permisos</h2>
+
+            <div className="glass-effect p-4 rounded-lg mb-6 flex gap-2">
+                <Input 
+                    type="text" 
+                    placeholder="Nombre del nuevo rol..."
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                />
+                <Button onClick={handleAddNewRole}><Plus className="w-4 h-4 mr-2" /> Añadir Rol</Button>
             </div>
 
             <div className="space-y-4">
-                {loading ? <p>Cargando roles...</p> : roles.map(role => (
-                    <div key={role.id} className="glass-effect p-4 rounded-lg flex justify-between items-center">
-                        <p className="font-bold">{role.name}</p>
-                        <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(role)} disabled={role.name === 'admin'}>
-                                <Edit className="w-4 h-4" />
-                            </Button>
-                            <AlertDialog open={!!deleteCandidate && deleteCandidate.id === role.id} onOpenChange={(open) => !open && setDeleteCandidate(null)}>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="icon" onClick={() => setDeleteCandidate(role)} disabled={['admin', 'co-admin'].includes(role.name)}>
-                                        <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Esta acción no se puede deshacer. Esto eliminará permanentemente el rol.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleDelete}>Eliminar</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                {roles.map(role => (
+                    <div key={role.id} className="glass-effect p-4 rounded-lg">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-semibold">{role.name}</h3>
+                            <div className="flex gap-2">
+                                <Button 
+                                    variant="outline"
+                                    onClick={() => setEditingRole(editingRole === role.id ? null : role.id)}
+                                >
+                                    {editingRole === role.id ? 'Cerrar Permisos' : 'Editar Permisos'}
+                                </Button>
+                                {role.name !== 'superadmin' && (
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" size="icon" onClick={() => setDeleteCandidate(role)}>
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>¿Confirmas la eliminación?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Eliminar el rol "{role.name}" revocará el acceso a todos los usuarios que lo tengan. Esta acción no se puede deshacer.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel onClick={() => setDeleteCandidate(null)}>Cancelar</AlertDialogCancel>
+                                                {/* CORRECCIÓN DE TIPO: </AlertDialogAction> */}
+                                                <AlertDialogAction onClick={handleDeleteRole}>Eliminar</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                )}
+                            </div>
                         </div>
+
+                        {editingRole === role.id && (
+                            <div className="border-t border-border/10 pt-4">
+                                <h4 className="font-semibold mb-3">Permisos para {role.name}</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                                    {allPermissions.map(permName => (
+                                        <label key={permName} className="flex items-center gap-2 text-sm p-2 rounded-md hover:bg-muted/50 cursor-pointer">
+                                            {/* El 'checked' y 'onChange' son idénticos a Vite */}
+                                            <input 
+                                                type="checkbox"
+                                                className="form-checkbox h-4 w-4 rounded bg-background text-primary border-border focus:ring-primary"
+                                                checked={!!permissions[role.id]?.[permName]}
+                                                onChange={() => togglePermission(role.id, permName)}
+                                                disabled={role.name === 'superadmin'}
+                                            />
+                                            {permName}
+                                        </label>
+                                    ))}
+                                </div>
+                                {role.name !== 'superadmin' && (
+                                    <Button onClick={() => handleSavePermissions(role.id)}>
+                                        <Save className="w-4 h-4 mr-2" /> Guardar Permisos
+                                    </Button>
+                                )}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
-
-            <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent className="max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>{editingRole ? 'Editar Rol' : 'Añadir Nuevo Rol'}</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="role-name">Nombre del Rol</Label>
-                            <Input id="role-name" value={roleName} onChange={(e) => setRoleName(e.target.value)} disabled={editingRole?.name === 'admin'} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Permisos</Label>
-                            <div className="grid grid-cols-2 gap-4 p-4 border rounded-md">
-                                {permissionsMap.map(p => (
-                                    <div key={p.id} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`perm-${p.id}`}
-                                            checked={permissions[p.id] || false}
-                                            onCheckedChange={() => handlePermissionChange(p.id)}
-                                            disabled={editingRole?.name === 'admin'}
-                                        />
-                                        <Label htmlFor={`perm-${p.id}`} className="font-normal">{p.label}</Label>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-                        <Button onClick={handleSubmit} disabled={editingRole?.name === 'admin'}>Guardar</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 };

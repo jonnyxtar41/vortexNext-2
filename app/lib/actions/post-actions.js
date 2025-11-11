@@ -1,10 +1,12 @@
 "use server";
 
-import { createClient } from '@/app/utils/supabase/server';
+
 import { logActivity } from '@/app/lib/supabase/log';
 import { sendSuperadminNotificationEmail } from '@/app/lib/supabase/email';
 import createDOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
+import { createClient } from '@/app/utils/supabase/server';
+import { revalidatePath } from 'next/cache';
 
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
@@ -140,29 +142,7 @@ export const updatePostEditStatus = async (editId, status, reviewerId) => {
     return { data, error };
 };
 
-export const deletePost = async (postId, postTitle, shouldLog = true) => {
-    const supabase = createClient();
-    const { data: existingPost, error: fetchError } = await supabase
-        .from('posts')
-        .select('status')
-        .eq('id', postId)
-        .single();
 
-    if (fetchError) {
-        console.error('Error fetching post for status check:', fetchError);
-    }
-
-    const { error } = await supabase
-        .from('posts')
-        .delete()
-        .eq('id', postId);
-
-    if (!error && shouldLog && existingPost && existingPost.status === 'published') {
-        await logActivity(supabase, `Usuario eliminó el recurso: "${postTitle}"`, { postId });
-    }
-
-    return { error };
-};
 
 export const incrementPostStat = async (postId, statType) => {
     const supabase = createClient();
@@ -175,3 +155,46 @@ export const incrementPostStat = async (postId, statType) => {
         console.error(`Error incrementing ${statType} for post ${postId}:`, error);
     }
 };
+
+
+export async function deletePost(postId) {
+    const supabase = createClient();
+    
+    if (!postId) {
+        return { error: { message: 'ID de post no válido' } };
+    }
+
+    try {
+        // (Opcional) Primero, elimina los 'post_edits' huérfanos si tienes RLS que lo impida
+        const { error: editError } = await supabase
+            .from('post_edits')
+            .delete()
+            .eq('post_id', postId);
+
+        if (editError) {
+             console.warn('Advertencia al eliminar post_edits:', editError.message);
+        }
+
+        // Elimina el post principal
+        const { error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('id', postId);
+
+        if (error) {
+            console.error('Error al eliminar post (Server Action):', error);
+            throw new Error(error.message);
+        }
+
+        revalidatePath('/control-panel-7d8a2b3c4f5e/pending-posts');
+        revalidatePath('/control-panel-7d8a2b3c4f5e/manage-content');
+        return { success: true };
+
+    } catch (error) {
+        console.error('Error en deletePost Server Action:', error.message);
+        return { error: { message: error.message } };
+    }
+}
+
+
+

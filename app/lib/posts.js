@@ -1,12 +1,13 @@
 'use server';
 
-import { supabase } from '@/lib/customSupabaseClient';
-import { logActivity } from '@/lib/supabase/log';
-import { sendSuperadminNotificationEmail } from '@/lib/supabase/email';
-import { getSiteContent } from '@/lib/supabase/siteContent';
+import { logActivity } from '@/app/lib/supabase/log';
+import { sendSuperadminNotificationEmail } from '@/app/lib/supabase/email';
 
+import { createClient } from '@/app/utils/supabase/server';
 
 export const getPosts = async (options = {}) => {
+
+    const supabase = createClient();
     const {
         section,
         categoryName,
@@ -68,6 +69,9 @@ export const getPosts = async (options = {}) => {
 
 
 export const getFeaturedPosts = async (options = {}) => {
+
+    const supabase = createClient();
+
     const { limit, withImage } = options;
     let query = supabase
         .from('posts')
@@ -97,6 +101,9 @@ export const getFeaturedPosts = async (options = {}) => {
 
 
 export const getPostBySlug = async (slug) => {
+
+    const supabase = createClient();
+
     const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -119,6 +126,9 @@ export const getPostBySlug = async (slug) => {
 };
 
 export const addPost = async (postData) => {
+
+    const supabase = createClient();
+
     const { data, error } = await supabase
         .from('posts')
         .insert([postData])
@@ -136,6 +146,9 @@ export const addPost = async (postData) => {
 };
 
 export const updatePost = async (postId, postData) => {
+
+    const supabase = createClient();
+    
     const { data: existingPost, error: fetchError } = await supabase
         .from('posts')
         .select('status')
@@ -164,6 +177,8 @@ export const updatePost = async (postId, postData) => {
 };
 
 export const addPostEdit = async (editData) => {
+    const supabase = createClient();
+
     const { data, error } = await supabase
         .from('post_edits')
         .insert([editData])
@@ -173,6 +188,9 @@ export const addPostEdit = async (editData) => {
 };
 
 export const getPendingEdits = async () => {
+
+    const supabase = createClient();
+
     const { data, error } = await supabase
         .from('post_edits')
         .select(`*, posts (title, slug), editor:editor_id (email)`)
@@ -188,6 +206,7 @@ export const getPendingEdits = async () => {
 };
 
 export const updatePostEditStatus = async (editId, status, reviewerId) => {
+    const supabase = createClient();
     const { data, error } = await supabase
         .from('post_edits')
         .update({ status, reviewed_at: new Date(), reviewer_id: reviewerId })
@@ -199,21 +218,23 @@ export const updatePostEditStatus = async (editId, status, reviewerId) => {
 };
 
 export const getRandomPosts = async (count) => {
-  const { data: posts, error } = await supabase
-    .from('posts')
-    .select('*, categories(name, gradient)')
-    .eq('status', 'published');
+    const supabase = createClient();
+    const { data: posts, error } = await supabase
+        .from('posts')
+        .select('*, categories(name, gradient)')
+        .eq('status', 'published');
 
-  if (error) {
-    console.error('Error fetching random posts:', error);
-    return [];
-  }
+    if (error) {
+        console.error('Error fetching random posts:', error);
+        return [];
+    }
 
-  const shuffled = posts.sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+    const shuffled = posts.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
 };
 
 export const getRandomPostsWithImages = async (count) => {
+    const supabase = createClient();
   const { data: posts, error } = await supabase
     .from('posts')
       .select('*, categories(name, gradient), sections(slug)')
@@ -231,6 +252,8 @@ export const getRandomPostsWithImages = async (count) => {
 };
 
 export const deletePost = async (postId, postTitle, shouldLog = true) => {
+
+    const supabase = createClient();
     const { data: existingPost, error: fetchError } = await supabase
         .from('posts')
         .select('status')
@@ -254,6 +277,8 @@ export const deletePost = async (postId, postTitle, shouldLog = true) => {
 };
 
 export const incrementPostStat = async (postId, statType) => {
+
+    const supabase = createClient();
     if (!postId || !statType) return;
     const { error } = await supabase.rpc('increment_post_stat', { 
         post_id_to_update: postId, 
@@ -265,6 +290,9 @@ export const incrementPostStat = async (postId, statType) => {
 };
 
 export const getAllPostStats = async () => {
+
+    const supabase = createClient();
+
     const { data, error } = await supabase
         .from('post_stats')
         .select('*');

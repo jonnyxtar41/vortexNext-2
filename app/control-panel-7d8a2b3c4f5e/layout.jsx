@@ -1,18 +1,25 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation'; // Importar useRouter
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, PlusSquare, Edit, BarChart, Users, Palette, Shield, Settings, FileText, DollarSign, MessageSquare, Folder, FileImage, Menu, X, LogOut, UserCog, Database, Clock } from 'lucide-react';
+import { 
+    Home, PlusSquare, Edit, BarChart, Users, Palette, Shield, Settings, 
+    FileText, DollarSign, MessageSquare, Folder, FileImage, Menu, X, 
+    LogOut, UserCog, Database, Clock 
+} from 'lucide-react';
 
 import { useToast } from '@/app/components/ui/use-toast';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 const AdminLayout = ({ children }) => {
-    const { user, permissions, signOut, isSuperAdmin } = useAuth();
+    // Obtenemos el estado de carga y el usuario. Renombramos 'loading' a 'authLoading'
+    const { user, permissions, signOut, isSuperAdmin, loading: authLoading } = useAuth(); 
     const { toast } = useToast();
     const pathname = usePathname();
+    const router = useRouter(); // Inicializamos el router
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const navItems = [
@@ -38,11 +45,37 @@ const AdminLayout = ({ children }) => {
     // Check if the current path is the admin login page
     const isLoginPage = pathname === '/control-panel-7d8a2b3c4f5e';
 
-    // If it's the login page, just render the children without the layout
+useEffect(() => {
+        // Si la autenticación no está cargando, no hay usuario, Y no estamos en la página de login...
+        if (!authLoading && !user && !isLoginPage) {
+            // ...redirigimos al login.
+            router.replace('/control-panel-7d8a2b3c4f5e');
+        }
+    }, [authLoading, user, isLoginPage, router]);
+
+    // Si es la página de login, renderízala sin el layout
     if (isLoginPage) {
         return <>{children}</>;
     }
 
+    // Si la autenticación está cargando, muestra un spinner
+    if (authLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <LoadingSpinner />
+            </div>
+        );
+    }
+
+    // Si la autenticación terminó pero no hay usuario, estamos en proceso de redirección.
+    // Muestra el spinner para evitar un parpadeo del layout.
+    if (!user) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <LoadingSpinner />
+            </div>
+        );
+    }
     return (
         <div className="flex h-screen bg-background text-foreground">
             <div className={`fixed inset-0 z-30 bg-black/50 md:hidden ${isSidebarOpen ? 'block' : 'hidden'}`} onClick={() => setIsSidebarOpen(false)}></div>

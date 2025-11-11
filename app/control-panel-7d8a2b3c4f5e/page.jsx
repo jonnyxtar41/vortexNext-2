@@ -10,9 +10,6 @@ export default function AdminLoginPage() {
     const { session, isAdmin, loading } = useAuth();
     const router = useRouter();
 
-    console.log('AdminLoginPage loading:', loading);
-    console.log('AdminLoginPage session:', session);
-    console.log('AdminLoginPage isAdmin:', isAdmin);
 
     useEffect(() => {
         if (!loading && session && isAdmin) {

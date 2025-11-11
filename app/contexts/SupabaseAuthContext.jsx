@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   }, [router]);
 
   const handleSession = useCallback(async (currentSession) => {
-    console.log('handleSession called, session:', currentSession);
+ 
     setSession(currentSession);
     const currentUser = currentSession?.user ?? null;
     setUser(currentUser);
@@ -65,26 +65,26 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log('AuthProvider useEffect started');
+ 
     const getInitialSession = async () => {
-      console.log('getInitialSession called');
+    
       
       try {
-        console.log('Calling supabase.auth.getSession()');
+    
         const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => 
           setTimeout(() => reject(new Error('getSession timeout')), 5000)
         );
 
         const { data: { session: initialSession } } = await Promise.race([sessionPromise, timeoutPromise]);
-        console.log('getSession completed, session:', initialSession);
+   
         await handleSession(initialSession);
-        console.log('getInitialSession completed');
+
       } catch (error) {
         console.error('Error during getInitialSession:', error);
         await handleSession(null);
       } finally {
-        console.log('Setting loading to false');
+        
         setLoading(false);
       }
     };
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
-        console.log('onAuthStateChange event:', event, newSession);
+      
         if (event === 'INITIAL_SESSION') {
           return;
         }

@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/app/lib/customSupabaseClient';
+
+
+import { createClient } from '@/app/utils/supabase/client';
 import { useToast } from '@/app/components/ui/use-toast';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
@@ -11,6 +13,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { UserPlus, Trash2, KeyRound, Eye, EyeOff, Edit, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
+
+const supabase = createClient();
 
 const callAdminFunction = async (action, payload, session) => {
     if (!session) {
