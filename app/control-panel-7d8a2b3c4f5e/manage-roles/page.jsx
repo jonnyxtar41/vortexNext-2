@@ -1,7 +1,6 @@
 'use client'; 
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { useToast } from '@/app/components/ui/use-toast';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
@@ -11,9 +10,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 // 1. Importamos 'createClient' como lo hace tu AuthContext
 import { createClient } from '@/app/utils/supabase/client';
 
+// 2. Creamos la instancia del cliente UNA SOLA VEZ fuera del componente
+const supabase = createClient();
+
 const ManageRoles = () => {
-    // 2. Creamos la instancia del cliente
-    const supabase = createClient();
     
     const { toast } = useToast();
     const [roles, setRoles] = useState([]);
@@ -72,6 +72,7 @@ const ManageRoles = () => {
 
         const { data, error } = await supabase.from('roles').insert({ name: newRoleName }).select().single();
         if (error) {
+            console.error("Error creating role:", JSON.stringify(error, null, 2));
             toast({ title: "Error al crear rol", description: error.message, variant: "destructive" });
         } else {
             toast({ title: "✅ Rol Creado", description: `El rol "${newRoleName}" ha sido añadido.` });
