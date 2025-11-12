@@ -2,7 +2,7 @@
 export const listSiteAssets = async (supabase) => {
     const { data, error } = await supabase.storage
         .from('site-assets')
-        .list('post-main-images', { // List files from the 'post-main-images' subfolder
+        .list('post-main-images', { // Debe listar 'post-main-images'
             limit: 100,
             offset: 0,
             sortBy: { column: 'created_at', order: 'desc' },
@@ -12,7 +12,7 @@ export const listSiteAssets = async (supabase) => {
 };
 
 export const deleteSiteAsset = async (supabase, assetNames) => {
-    const subfolder = 'post-main-images';
+    const subfolder = 'post-main-images'; // Debe tener el subfolder
     let pathsToDelete = [];
 
     if (Array.isArray(assetNames)) {
@@ -28,10 +28,15 @@ export const deleteSiteAsset = async (supabase, assetNames) => {
     return { data, error };
 };
 
-export const uploadSiteAsset = async (supabase, file, path) => {
+
+
+export const uploadSiteAsset = async (supabase, file, filePath) => {
+    // Asegurarnos que la ruta de subida incluya el subfolder
+    const fullPath = filePath.startsWith('post-main-images/') ? filePath : `post-main-images/${filePath}`;
+
     const { data, error } = await supabase.storage
       .from('site-assets')
-      .upload(path, file, {
+      .upload(fullPath, file, { // 'fullPath'
         cacheControl: '3600',
         upsert: true,
       });

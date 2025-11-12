@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react'; // 1. Importar useRef
 import { motion } from 'framer-motion';
-import { supabase } from '@/app/lib/customSupabaseClient';
+// 2. Importar el cliente correcto de Next.js
+import { createClient } from '@/app/utils/supabase/client'; 
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Lightbulb, Mail, Clock, RefreshCw, Trash2 } from 'lucide-react';
@@ -16,9 +17,12 @@ const ManageSuggestions = () => {
     const [loading, setLoading] = useState(true);
     const { session } = useAuth();
     const { toast } = useToast();
+    // 3. Crear la instancia de Supabase usando useRef
+    const supabaseRef = useRef(createClient());
 
     const fetchSuggestions = useCallback(async () => {
         setLoading(true);
+        const supabase = supabaseRef.current; // 4. Obtener la instancia
         const { data, error } = await supabase
             .from('suggestions')
             .select('*')
@@ -31,13 +35,14 @@ const ManageSuggestions = () => {
             setSuggestions(data);
         }
         setLoading(false);
-    }, [toast]);
+    }, [toast]); // No es necesario añadir supabaseRef.current a las dependencias
 
     useEffect(() => {
         fetchSuggestions();
     }, [fetchSuggestions]);
 
     const callAdminFunction = async (action, payload) => {
+        const supabase = supabaseRef.current; // 4. Obtener la instancia
         if (!session) throw new Error("No hay sesión activa.");
         const { data, error } = await supabase.functions.invoke('user-management', {
             body: JSON.stringify({ action, payload }),
