@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { createClient } from '@/app/utils/supabase/client'; 
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { BookUser, Clock, RefreshCw, Search, AlertTriangle } from 'lucide-react';
+import { BookOpen, Clock, RefreshCw, Search, AlertTriangle } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { useToast } from '@/app/components/ui/use-toast';
@@ -71,7 +71,7 @@ const ActivityLog = () => {
         >
             <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
-                    <BookUser className="w-8 h-8 text-primary" />
+                    <BookOpen className="w-8 h-8 text-primary" />
                     Registro de Actividad
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">

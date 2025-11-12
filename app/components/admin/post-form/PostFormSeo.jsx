@@ -13,6 +13,7 @@ import { Input } from '@/app/components/ui/input'; // Adjusted path
 import ImageCropperModal from '@/app/components/ImageCropperModal'; // Adjusted path
 import { uploadBase64Image } from '@/app/lib/supabase/assets'; // Adjusted path
 import { useToast } from '@/app/components/ui/use-toast'; // Adjusted path
+import { createClient } from '@/app/utils/supabase/client';
 
 const PostFormSeo = ({
     title, // Prop para el título principal
@@ -40,6 +41,7 @@ const PostFormSeo = ({
     const metaTitleRef = useRef(null);
     const metaDescriptionRef = useRef(null);
     const { toast } = useToast();
+    const supabase = createClient();
 
     useAutosizeTextArea(metaTitleRef.current, metaTitle);
     useAutosizeTextArea(metaDescriptionRef.current, metaDescription);
@@ -60,7 +62,7 @@ const PostFormSeo = ({
         setIsUploadingImage(true);
         toast({ title: "Subiendo imagen..." });
         try {
-            const publicUrl = await uploadBase64Image(croppedImageUrl);
+            const publicUrl = await uploadBase64Image(supabase, croppedImageUrl);
             if (publicUrl) {
                 setMainImage(publicUrl);
                 setMainImagePreview(publicUrl);
@@ -75,7 +77,7 @@ const PostFormSeo = ({
         } finally {
             setIsUploadingImage(false);
         }
-    }, [setMainImage, setMainImagePreview, toast]);
+    }, [setMainImage, setMainImagePreview, toast, supabase]);
 
     const defaultKeywords = [
         "React", "JavaScript", "Tutorial", "Desarrollo Web", "Guía", "TailwindCSS", "Vite", "Frontend"

@@ -21,9 +21,10 @@ import { useToast } from '@/app/components/ui/use-toast';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuSeparator } from "@/app/components/ui/dropdown-menu";
 import {
   AlignCenter, AlignLeft, AlignRight, Trash2, Lock, Unlock,
-  Bold, Italic, Underline as UnderlineIcon, Link as LinkIcon, Heading1, Heading2, Heading3, PaintBucket
+  Bold, Italic, Underline as UnderlineIcon, Link as LinkIcon, Heading1, Heading2, Heading3, PaintBucket, Link2
 } from 'lucide-react';
 import { uploadPostImage } from '@/app/lib/supabase/assets';
+import { createClient } from '@/app/utils/supabase/client';
 
 const PREDEFINED_COLORS = [
   { label: 'Negro', value: '#000000' },
@@ -227,6 +228,13 @@ const TableCell = BaseTableCell.extend({
   },
 });
 
+const getYouTubeID = (url) => {
+  if (!url) return null;
+  const regex = /(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|shorts\/)?([a-zA-Z0-9_-]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+};
+
 const ResizableYouTubeTemplate = ({ node, updateAttributes, editor, getPos }) => {
   const { src, align, width, height } = node.attrs;
   const [localWidth, setLocalWidth] = useState(width);
@@ -281,7 +289,8 @@ const ResizableYouTubeTemplate = ({ node, updateAttributes, editor, getPos }) =>
     }
   };
 
-  const embedSrc = src ? src.replace(/(?:https?:)?\/\/(?:www\.)?(?:m\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/g, 'https://www.youtube.com/embed/$1') : '';
+  const videoId = getYouTubeID(src);
+  const embedSrc = videoId ? `https://www.youtube.com/embed/${videoId}` : '';
 
   const containerStyle = {
     display: 'flex',
@@ -357,9 +366,8 @@ const ResizableYouTube = Youtube.extend({
     const height = HTMLAttributes.height || this.options.height;
 
     const getEmbedURL = (url) => {
-      if (!url) return '';
-      // Re-use the same regex from the template to ensure consistency
-      return url.replace(/(?:https?:)?\/\/(?:www\.)?(?:m\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/g, 'https://www.youtube.com/embed/$1');
+      const videoId = getYouTubeID(url);
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
     }
 
     const wrapperStyle = {
@@ -394,6 +402,7 @@ const ResizableYouTube = Youtube.extend({
 
 const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aquí...", onAiAction, onGenerateContent, getEditor, onInternalLink, onSuggestLinks }) => {
   const { toast } = useToast();
+  const supabase = createClient();
   
   const editor = useEditor({
     extensions: [
@@ -468,7 +477,7 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
     toast({ title: "Subiendo imagen..." });
 
     try {
-      const imageUrl = await uploadPostImage(file);
+      const imageUrl = await uploadPostImage(supabase, file);
       if (imageUrl) {
         editor.chain().focus().setImage({ src: imageUrl }).run();
         toast({ title: "✅ Imagen subida correctamente" });
@@ -482,7 +491,7 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
         variant: "destructive",
       });
     }
-  }, [editor, toast]);
+  }, [editor, toast, supabase]);
   
   const setLink = useCallback(() => {
     if (!editor) return;
@@ -552,6 +561,9 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
           <div className="w-px h-6 bg-muted-foreground mx-1" />
           <button onClick={setLink} className={`p-2 rounded hover:bg-accent ${editor.isActive('link') ? 'bg-accent' : ''}`}>
             <LinkIcon className="w-4 h-4" />
+          </button>
+          <button onClick={onInternalLink} className="p-2 rounded hover:bg-accent">
+            <Link2 className="w-4 h-4" />
           </button>
           
           <DropdownMenu>

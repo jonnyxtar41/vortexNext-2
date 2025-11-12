@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/app/lib/customSupabaseClient';
+// CORRECCIÓN 1: Importamos createClient desde la ruta correcta de Next.js
+import { createClient } from '@/app/utils/supabase/client';
 import { useToast } from '@/app/components/ui/use-toast';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { Database, Server, HardDrive, RefreshCw, AlertTriangle, CheckCircle, Table, Key, Link2, Share2 } from 'lucide-react';
@@ -57,11 +58,16 @@ const ManageResources = () => {
     const [healthData, setHealthData] = useState(null);
     const [dbSchema, setDbSchema] = useState(null);
     const [loading, setLoading] = useState(true);
+    
+    // CORRECCIÓN 2: Instanciamos el cliente de Supabase aquí
+    const supabase = createClient();
 
     const fetchData = useCallback(async () => {
         if (!session) return;
         setLoading(true);
         try {
+            // Nota: Asegúrate de que estas Edge Functions ('system-health' y 'get-db-schema') 
+            // estén desplegadas en tu proyecto de Supabase para que esto funcione.
             const [health, schema] = await Promise.all([
                 supabase.functions.invoke('system-health'),
                 supabase.functions.invoke('get-db-schema')
@@ -74,11 +80,13 @@ const ManageResources = () => {
             setDbSchema(schema.data);
 
         } catch (error) {
-            toast({ title: 'Error al cargar los datos del sistema', description: error.message, variant: 'destructive' });
+            console.error("Error fetching resources:", error);
+            // Es posible que falle si las funciones no existen, manejamos el error visualmente
+            toast({ title: 'Error al cargar los datos del sistema', description: error.message || 'Verifica que las Edge Functions estén activas', variant: 'destructive' });
         } finally {
             setLoading(false);
         }
-    }, [session, toast]);
+    }, [session, toast, supabase]); // Agregamos supabase a las dependencias
 
     useEffect(() => {
         fetchData();
@@ -112,14 +120,14 @@ const ManageResources = () => {
                             value={dbSize.split(' ')[0] || '0'}
                             unit={dbSize.split(' ')[1] || 'B'}
                             icon={Database}
-                            status={healthData?.database.status || 'warning'}
+                            status={healthData?.database?.status || 'warning'}
                         />
                         <StatCard
                             title="Almacenamiento"
                             value={storageSize.split(' ')[0] || '0'}
                             unit={storageSize.split(' ')[1] || 'B'}
                             icon={HardDrive}
-                            status={healthData?.storage.status || 'warning'}
+                            status={healthData?.storage?.status || 'warning'}
                         />
                     </div>
 
@@ -132,7 +140,7 @@ const ManageResources = () => {
                             {functions.length > 0 ? (
                                 functions.map(fn => <FunctionCard key={fn.name} name={fn.name} status={fn.status} />)
                             ) : (
-                                <p className="text-muted-foreground">No se encontraron funciones.</p>
+                                <p className="text-muted-foreground">No se encontraron funciones activas o no se pudo conectar con el servicio.</p>
                             )}
                         </div>
                     </div>
@@ -144,18 +152,18 @@ const ManageResources = () => {
                         </h3>
                         {dbSchema ? (
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {dbSchema.tables.map(table => (
+                                {dbSchema.tables?.map(table => (
                                     <div key={table.table_name} className="bg-background/50 p-4 rounded-lg">
                                         <h4 className="font-bold text-lg text-foreground flex items-center gap-2"><Table className="w-5 h-5 text-secondary-foreground" /> {table.table_name}</h4>
                                         <ul className="mt-2 space-y-1 text-sm text-muted-foreground pl-2 border-l-2 border-primary/30">
-                                            {table.columns.map(col => (
+                                            {table.columns?.map(col => (
                                                 <li key={col.column_name} className="flex items-center gap-2 font-mono">
                                                     {col.is_primary_key && <Key className="w-3 h-3 text-yellow-400" />}
                                                     {col.column_name}: <span className="text-text-subtle">{col.data_type}</span>
                                                 </li>
                                             ))}
                                         </ul>
-                                        {table.foreign_keys.length > 0 && (
+                                        {table.foreign_keys?.length > 0 && (
                                             <div className="mt-3 pt-3 border-t border-border/10">
                                                 <h5 className="text-xs font-semibold uppercase text-text-subtle mb-2">Relaciones</h5>
                                                 <ul className="space-y-2 text-sm">
@@ -172,7 +180,7 @@ const ManageResources = () => {
                                 ))}
                             </div>
                         ) : (
-                             <p className="text-muted-foreground">Cargando esquema de la base de datos...</p>
+                             <p className="text-muted-foreground">No se pudo cargar el esquema o no está disponible.</p>
                         )}
                     </div>
                 </div>

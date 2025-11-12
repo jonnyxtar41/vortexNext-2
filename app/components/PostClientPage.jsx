@@ -21,6 +21,13 @@ import CommentsSection from '@/app/components/CommentsSection';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/components/ui/dropdown-menu";
 import PostCard from '@/app/components/PostCard';
 
+const getYouTubeID = (url) => {
+    if (!url) return null;
+    const regex = /(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|shorts\/)?([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+};
+
 export default function PostClientPage({ post, recommendedPosts, similarPosts }) {
     const [currentUrl, setCurrentUrl] = useState('');
     const { toast } = useToast();
@@ -98,7 +105,9 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
                 const iframeNode = domNode.children.find(child => child.name === 'iframe');
                 if (iframeNode) {
                     const { src, allow, allowfullscreen, frameborder, width, height, ...rest } = iframeNode.attribs;
-                    const props = { ...rest, src, allow,
+                    const videoId = getYouTubeID(src);
+                    const embedSrc = videoId ? `https://www.youtube.com/embed/${videoId}` : src;
+                    const props = { ...rest, src: embedSrc, allow,
                         allowFullScreen: allowfullscreen === 'true' || allowfullscreen === '',
                         frameBorder: frameborder, width: width || '100%', height: height || '100%',
                     };
@@ -112,7 +121,9 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
 
             if (domNode.name === 'iframe') {
                 const { src, allow, allowfullscreen, frameborder, ...rest } = domNode.attribs;
-                const props = { ...rest, src, allow,
+                const videoId = getYouTubeID(src);
+                const embedSrc = videoId ? `https://www.youtube.com/embed/${videoId}` : src;
+                const props = { ...rest, src: embedSrc, allow,
                     allowFullScreen: allowfullscreen === 'true' || allowfullscreen === '',
                     frameBorder: frameborder,
                 };

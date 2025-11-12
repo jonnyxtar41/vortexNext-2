@@ -12,6 +12,7 @@ import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
+import { useCallback } from 'react';
 
 const supabase = createClient();
 
@@ -86,6 +87,67 @@ const CheckoutPage = () => {
         }
         return parseFloat(post.price).toFixed(2);
     }, [post]);
+
+    const setupPayPal = useCallback(() => {
+        if (!config.paypal_client_id || !document.getElementById('paypal-button-container') || window.paypal || !config.enable_paypal) return;
+
+        const script = document.createElement("script");
+        script.src = `https://www.paypal.com/sdk/js?client-id=${config.paypal_client_id}&currency=${post.currency}&intent=capture`;
+        script.onload = () => {
+            if (window.paypal) {
+                window.paypal.Buttons({
+                    createOrder: (data, actions) => {
+                        if (finalAmount <= 0) {
+                            toast({ title: '💰 El monto debe ser mayor a cero.', variant: 'destructive' });
+                            return Promise.reject(new Error('El monto debe ser mayor a cero.'));
+                        }
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: { value: String(finalAmount) },
+                                custom_id: post.id,
+                                description: `Compra de: ${post.title}`
+                            }]
+                        });
+                    },
+                    onApprove: (data, actions) => actions.order.capture().then(async (details) => {
+                        await addPayment({
+                            user_id: user?.id,
+                            email: details.payer.email_address,
+                            amount: details.purchase_units[0].amount.value,
+                            currency: details.purchase_units[0].amount.currency_code,
+                            payment_provider: 'paypal',
+                            provider_payment_id: details.id,
+                            status: 'succeeded',
+                            item_type: 'post',
+                            item_id: post.id,
+                            donor_name: `${details.payer.name.given_name} ${details.payer.name.surname}`,
+                        });
+                        toast({ title: '💖 ¡Compra con PayPal exitosa!', description: `Gracias por tu compra, ${details.payer.name.given_name}!` });
+                        router.push(`/post/${post.slug}?status=success`);
+                    }),
+                    onError: (err) => {
+                        console.error("PayPal Button Error:", err);
+                        toast({ title: '❌ Error de PayPal', description: 'Ocurrió un error al procesar el pago. Por favor, inténtalo de nuevo.', variant: 'destructive' });
+                    }
+                }).render('#paypal-button-container').catch(err => {
+                    console.error("PayPal render error:", err)
+                    // Opcional: Mostrar un mensaje al usuario si los botones no se pueden renderizar
+                });
+            }
+        };
+        script.onerror = () => {
+            console.error("Error al cargar el script de PayPal SDK.");
+            toast({ title: '❌ Error de Carga', description: 'No se pudo cargar el script de PayPal. Revisa tu conexión o la configuración.', variant: 'destructive' });
+        };
+        document.body.appendChild(script);
+
+    }, [config.paypal_client_id, config.enable_paypal, post, finalAmount, toast, user, router]);
+
+    useEffect(() => {
+        if (!loading && post) {
+            setupPayPal();
+        }
+    }, [loading, post, setupPayPal]);
     
     // Función para crear PaymentIntent para Stripe
     const createPaymentIntent = async (e) => {
@@ -185,6 +247,7 @@ const CheckoutPage = () => {
     
     const isStripeActive = config.enable_stripe === true && config.stripe_publishable_key;
     const isPayPhoneActive = config.enable_payphone === true && config.payphone_app_id;
+    const isPayPalActive = config.enable_paypal === true && config.paypal_client_id;
 
     return (
         <>
@@ -230,13 +293,15 @@ const CheckoutPage = () => {
                             ) : null}
 
 
-                            {/* --- OPCIÓN DE PAGO CON PAYPHONE --- */}
-                            {isPayPhoneActive && (
-                                <>
-                                    <div className="relative my-4">
-                                        <div className="absolute inset-0 flex items-center" aria-hidden="true"><div className="w-full border-t border-white/20" /></div>
-                                        {isStripeActive && <div className="relative flex justify-center"><span className="bg-gray-800 px-2 text-sm text-muted-foreground">o</span></div>}
-                                    </div>
+                            <div className="relative my-4">
+                                <div className="absolute inset-0 flex items-center" aria-hidden="true"><div className="w-full border-t border-white/20" /></div>
+                                {(isStripeActive || isPayPhoneActive) && <div className="relative flex justify-center"><span className="bg-gray-800 px-2 text-sm text-muted-foreground">o</span></div>}
+                            </div>
+
+                            <div className="space-y-4">
+                                {isPayPalActive && <div id="paypal-button-container"></div>}
+
+                                {isPayPhoneActive && (
                                     <Button
                                         type="button"
                                         onClick={handlePayPhoneCheckout}
@@ -246,11 +311,11 @@ const CheckoutPage = () => {
                                     >
                                         {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Pagar con PayPhone (Ecuador)'}
                                     </Button>
-                                </>
-                            )}
-                            {/* --- FIN OPCIÓN DE PAGO CON PAYPHONE --- */}
+                                )}
+                            </div>
+                            
 
-                            {!isStripeActive && !isPayPhoneActive && (
+                            {!isStripeActive && !isPayPhoneActive && !isPayPalActive && (
                                 <p className="text-center text-red-400">Error: No hay métodos de pago activos. Por favor, contacta al soporte.</p>
                             )}
                         </form>

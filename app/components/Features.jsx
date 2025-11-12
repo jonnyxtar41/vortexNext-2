@@ -50,7 +50,7 @@ const Features = ({ categories = [] }) => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Link href={`/recursos?categoria=${encodeURIComponent(category.name)}`} className="block glass-effect rounded-2xl p-8 card-hover group h-full">
+                <Link href={`/recursos`} className="block glass-effect rounded-2xl p-8 card-hover group h-full">
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <Icon className="w-8 h-8 text-white" />
                   </div>

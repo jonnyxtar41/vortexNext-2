@@ -76,9 +76,25 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            a: {
+              color: theme('colors.orange.500'),
+              '&:hover': {
+                color: theme('colors.orange.600'),
+              },
+            },
+          },
+        },
         invert: {
           css: {
             '--tw-prose-bold': theme('colors.black'),
+            a: {
+              color: theme('colors.orange.400'),
+              '&:hover': {
+                color: theme('colors.orange.300'),
+              },
+            },
           },
         },
         lg: {
