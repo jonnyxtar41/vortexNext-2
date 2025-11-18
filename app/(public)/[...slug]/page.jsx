@@ -12,6 +12,28 @@ async function getTaxonomyData(slugArray) {
     const supabase = createClient();
     const [sectionSlug, categorySlug, subcategorySlug] = slugArray;
 
+    if (sectionSlug === 'explorar') {
+        return {
+            section: { 
+                id: 'all', // ID ficticio
+                name: 'Explorar', 
+                slug: 'explorar', 
+                plural_name: 'Publicaciones' 
+            },
+            category: null,
+            subcategory: null,
+            pageTitle: 'Explorar Contenido',
+            pageDescription: 'Descubre todos nuestros artículos, recursos y noticias en un solo lugar.',
+            config: {
+                title: 'Explorar',
+                plural: 'Publicaciones',
+                searchPlaceholder: 'Buscar en todo el sitio...',
+                description: 'Explora todo nuestro contenido.',
+                basePath: '/explorar'
+            }
+        };
+    }
+
     let section, category, subcategory;
 
     // 1. Obtener Sección (requerida)
@@ -125,7 +147,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     
     const slugArray = params.slug || [];
     
-    // --- ¡NUEVA VALIDACIÓN! ---
+    
     // Evita que esta ruta dinámica capture rutas reservadas de la aplicación.
     const RESERVED_PATHS = ['admin', 'control-panel-7d8a2b3c4f5e', 'login', 'register', 'auth', 'edit-post', 'forgot-password', 'update-password'];
     if (RESERVED_PATHS.includes(slugArray[0])) {
@@ -145,15 +167,19 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // --- 2. Búsqueda y Paginación ---
     const page = parseInt(searchParams.page || '1', 10);
     const searchQuery = searchParams.q || '';
-
+    
+    const categoryQuery = searchParams.cat || null;
 
 
 
 
 // 1. Define tus parámetros de consulta base
     let postParams = {
-        section: section.slug,
-        categoryName: category?.name,
+        section: section.slug === 'explorar' ? null : section.slug,
+        categoryName: (section.slug === 'explorar' && categoryQuery) 
+            ? categoryQuery 
+            : category?.name,
+            
         subcategoryName: subcategory?.name,
         searchQuery: searchQuery,
         page: page,

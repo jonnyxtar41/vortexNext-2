@@ -51,11 +51,14 @@ const Features = ({ categories = [] }) => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category, index) => {
             // Normalizamos el nombre para buscar el icono (minúsculas)
+            console.log("Categorias:",category);
             const iconKey = category.name?.toLowerCase() || 'default';
             const Icon = iconMap[iconKey] || iconMap.default;
             
             // Generamos el slug si no viene en la data (fallback)
-            const slug = category.slug || category.name.toLowerCase().replace(/\s+/g, '-');
+            const targetHref = category.name 
+                ? `/explorar?cat=${encodeURIComponent(category.name)}`
+                : '/explorar';
             
             return (
               <motion.div
@@ -66,8 +69,9 @@ const Features = ({ categories = [] }) => {
                 viewport={{ once: true }}
               >
                 {/* ENLACE DINÁMICO CORREGIDO */}
+                
                 <Link 
-                  href={`/category/${slug}`} 
+                  href={targetHref} // Usa la ruta segura
                   className="block bg-white dark:bg-gray-600 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-600 h-full group"
                 >
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -75,13 +79,13 @@ const Features = ({ categories = [] }) => {
                   </div>
                   
                   <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                    {category.name}
+                    {category.name || 'Categoría Desconocida'}
                   </h3>
                   
                   <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
                     Explora todos los recursos, artículos y guías sobre {category.name}.
                   </p>
-                </Link>
+                </Link >
               </motion.div>
             );
           })}
