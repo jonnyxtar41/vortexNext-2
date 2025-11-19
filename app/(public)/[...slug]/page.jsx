@@ -6,6 +6,8 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { createClient } from '@/app/utils/supabase/server';
 
+import { getCategories } from '@/app/lib/supabase/categories'; // Temporal, si necesitas categorías
+
 const POSTS_PER_PAGE = 9;
 
 async function getTaxonomyData(slugArray) {
@@ -144,6 +146,16 @@ export async function generateMetadata({ params, searchParams }) {
 // --- El Componente Page (Server Component) ---
 export default async function DynamicPostListPage({ params, searchParams }) {
     const supabase = createClient();
+
+    try {
+        const allCategories = await getCategories(supabase);
+        // Mapeamos para ver solo el nombre y slug, que son relevantes para el filtro
+        console.log('[DEBUG VORTEX] LISTA COMPLETA DE CATEGORÍAS EN DB:');
+        allCategories.forEach(c => console.log(`  - Name: "${c.name}", Slug: "${c.slug}"`));
+    } catch (e) {
+        console.error('[DEBUG VORTEX] Error al obtener categorías de la DB:', e);
+    }
+    // 👆 FIN DEL BLOQUE DE DEBUG
     
     const slugArray = params.slug || [];
     

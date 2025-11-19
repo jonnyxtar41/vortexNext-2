@@ -50,38 +50,47 @@ export const getPosts = async (supabase, {
     query = query.in('status', statuses)
                  .order('created_at', { ascending: false });
 
+
     if (all) {
         query = query.range(0, 500);
     }
 
     if (section) {
         query = query.eq('sections.slug', section);
+        console.log(`[DEBUG VORTEX POSTS] Filtrando por sección en query: "${section}"`);
     }
 
     if (categoryName) {
-        query = query.eq('categories.name', categoryName);
+        
+        query = query.ilike('categories.name', `%${categoryName}%`);
+        console.log(`[DEBUG VORTEX POSTS] Filtrando por categoría en query: "${categoryName}"`);
     }
     
     if (subcategoryName) {
         query = query.eq('subcategories.name', subcategoryName); 
+        console.log(`[DEBUG VORTEX POSTS] Filtrando por subcategoría en query: "${subcategoryName}"`);
     }
     
     if (searchQuery) {
         query = query.ilike('title', `%${searchQuery}%`);
+        console.log(`[DEBUG VORTEX POSTS] Filtrando por búsqueda en query: "${searchQuery}"`);
     }
 
     if (onlyDownloadable) {
         query = query.not('download', 'is', null);
+        console.log(`[DEBUG VORTEX POSTS] Filtrando solo posts descargables.`);
     }
     
     if (isPremium !== null) {
         query = query.eq('is_premium', isPremium);
+        console.log(`[DEBUG VORTEX POSTS] Filtrando por isPremium en query: "${isPremium}"`);
     }
 
     if (!all) {
         const from = (page - 1) * limit;
         const to = page * limit - 1;
         query = query.range(from, to);
+        console.log(`[DEBUG VORTEX POSTS] Aplicando paginación: from ${from} to ${to}`);
     }
 
     const { data, error, count } = await query;
