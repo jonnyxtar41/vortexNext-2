@@ -29,6 +29,9 @@ export const getPosts = async (supabase, {
     includeDrafts = false,
     includePending = false
 }) => {
+
+    console.log(`[DEBUG VORTEX POSTS] Recibida categoría: "${categoryName}"`);
+    
     let query = supabase
         .from('posts')
         .select(`

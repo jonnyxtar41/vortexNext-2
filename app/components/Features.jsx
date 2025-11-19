@@ -50,15 +50,22 @@ const Features = ({ categories = [] }) => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category, index) => {
-            // Normalizamos el nombre para buscar el icono (minúsculas)
-            console.log("Categorias:",category);
-            const iconKey = category.name?.toLowerCase() || 'default';
-            const Icon = iconMap[iconKey] || iconMap.default;
-            
-            // Generamos el slug si no viene en la data (fallback)
-            const targetHref = category.name 
-                ? `/explorar?cat=${encodeURIComponent(category.name)}`
-                : '/explorar';
+                // Normalizamos el nombre para buscar el icono (minúsculas)
+                // console.log("Categorias:",category); // Mantener este o el nuevo para depurar
+                const iconKey = category.name?.toLowerCase() || 'default';
+                const Icon = iconMap[iconKey] || iconMap.default;
+                
+                // --- INICIO DE CAMBIO PARA ROBUSTEZ Y DEBUG ---
+                const categoryName = category.name?.trim() || ''; // Usamos .trim() para evitar errores por espacios
+                
+                // Generamos el slug si no viene en la data (fallback)
+                const targetHref = categoryName 
+                    ? `/explorar?cat=${encodeURIComponent(categoryName)}`
+                    : '/explorar';
+                    
+                // AGREGAR ESTE CONSOLE.LOG PARA VERIFICAR LA URL GENERADA EN LA CONSOLA DEL CLIENTE
+                console.log(`[DEBUG ZONA VORTEX] Clic en categoría: "${categoryName}" -> Enlace generado: "${targetHref}"`);
+                // --- FIN DE CAMBIO PARA ROBUSTEZ Y DEBUG ---
             
             return (
               <motion.div

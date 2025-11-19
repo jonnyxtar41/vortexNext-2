@@ -169,6 +169,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     const searchQuery = searchParams.q || '';
     
     const categoryQuery = searchParams.cat || null;
+    const normalizedCategoryQuery = categoryQuery ? categoryQuery.toLowerCase().trim() : null;
 
 
 
@@ -176,10 +177,9 @@ export default async function DynamicPostListPage({ params, searchParams }) {
 // 1. Define tus parámetros de consulta base
     let postParams = {
         section: section.slug === 'explorar' ? null : section.slug,
-        categoryName: (section.slug === 'explorar' && categoryQuery) 
-            ? categoryQuery 
+        categoryName: (section.slug === 'explorar' && normalizedCategoryQuery) 
+            ? normalizedCategoryQuery // <-- ¡Usamos el valor limpio y minúscula!
             : category?.name,
-            
         subcategoryName: subcategory?.name,
         searchQuery: searchQuery,
         page: page,
@@ -187,18 +187,19 @@ export default async function DynamicPostListPage({ params, searchParams }) {
         onlyDownloadable: false, // Default a false
         isPremium: null          // Default a null (usa el filtro de client.js)
     };
+    console.log('[DEBUG VORTEX] Parámetros de PostQuery FINAL:', postParams);
 
     // 2. Comprueba si estamos en la sección "Freemium"
     if (section.slug === 'zona-freemium') {
         // 3. ¡Sobrescribe los filtros!
-        postParams.section = null;          // NO filtres por esta sección
+        postParams.section = null;          // NO filtres por esta se   cción
         postParams.categoryName = null;     // NO filtres por categoría
         postParams.subcategoryName = null;  // NO filtres por subcategoría
         postParams.isPremium = true;      // <-- ¡Pide solo posts Premium!
         postParams.onlyDownloadable = true; // <-- Y que también sean descargables
     } else {
         // (Opcional) Si la zona-freemium es la ÚNICA que muestra descargables
-        // postParams.onlyDownloadable = false; 
+        //       postParams.onlyDownloadable = false; 
     }
 
     // 4. Llama a getPosts con los parámetros correctos
