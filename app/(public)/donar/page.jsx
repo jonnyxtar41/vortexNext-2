@@ -17,7 +17,7 @@ import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 
 const DonatePage = () => {
     const supabase = createClient();
-    
+        
     const { toast } = useToast();
     const { user } = useAuth();
     const [config, setConfig] = useState({

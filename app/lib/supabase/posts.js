@@ -47,3 +47,21 @@ export const getPostImageUrls = async (supabase) => {
 
     return data?.map(post => post.main_image_url) || [];
 };
+
+
+export const getPopularPostsSlugs = async (supabase, limit = 100) => {
+    const { data, error } = await supabase
+        .from('posts')
+        .select('slug')
+        .eq('status', 'published')
+        
+        .order('created_at', { ascending: false }) // Obtiene los más recientes para pre-renderizar
+        .limit(limit);
+
+    if (error) {
+        console.error('Error fetching post slugs for static generation:', error);
+        return [];
+    }
+
+    return data || [];
+};

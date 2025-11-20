@@ -2,12 +2,15 @@ import { createClient } from '@/app/utils/supabase/server';
 import { 
     getPostBySlug, 
     getRelatedPosts, 
-    getPosts // Necesitamos getPosts para los "Recomendados"
-} from '@/app/lib/supabase/client'; 
+    getPosts,
+    getPopularPostsSlugs // <-- Nueva función para generateStaticParams
+} from '@/app/lib/supabase/client'; // Asumiendo que getPopularPostsSlugs se exporta desde aquí
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import PostClientPage from '@/app/components/PostClientPage'; 
-import { unstable_noStore as noStore } from 'next/cache';
+
+export const revalidate = 3600; 
+
 
 // --- Generación de Metadata (SEO) ---
 // (Tu función generateMetadata está perfecta, no la cambies)
@@ -44,7 +47,7 @@ export async function generateMetadata({ params }) {
 
 // --- El Componente Page (Server Component) ---
 export default async function PostPage({ params }) {
-    noStore(); // Evita que esta página se cachee estáticamente si necesitas visitas en tiempo real
+
     const supabase = createClient();
     const { slug } = params;
     
