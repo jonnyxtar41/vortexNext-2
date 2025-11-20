@@ -1,16 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useAuth } from '@/app/contexts/SupabaseAuthContext';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-export const metadata = {
-  title: 'Recuperar Contraseña - Admin Panel',
-};
+
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');

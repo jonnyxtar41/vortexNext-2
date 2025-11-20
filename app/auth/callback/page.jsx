@@ -2,11 +2,9 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/app/components/ui/use-toast';
 
-export const metadata = {
-  title: 'Verificando...',
-};
+
 
 const AuthCallback = () => {
     const router = useRouter();
