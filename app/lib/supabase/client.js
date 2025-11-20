@@ -21,6 +21,7 @@ export const getPosts = async (supabase, {
     limit = 10, 
     section = null, 
     categoryName = null, 
+    categoryId = null,
     subcategoryName = null,
     searchQuery = null, 
     all = false,
@@ -56,14 +57,24 @@ export const getPosts = async (supabase, {
     }
 
     if (section) {
-        query = query.eq('sections.slug', section);
-        console.log(`[DEBUG VORTEX POSTS] Filtrando por sección en query: "${section}"`);
+        query = query.ilike('sections.slug', `%${section}%`); 
+        console.log(`[DEBUG VORTEX POSTS] Filtrando por sección en query: "%${section}%" (ILIKE)`);
     }
 
     if (categoryName) {
         
         query = query.ilike('categories.name', `%${categoryName}%`);
         console.log(`[DEBUG VORTEX POSTS] Filtrando por categoría en query: "${categoryName}"`);
+    }
+    if (categoryId) {
+        // Prioridad 1: Filtrar por ID (El más estable y directo)
+        query = query.eq('category_id', categoryId);
+        console.log(`[DEBUG VORTEX POSTS] Aplicando filtro de Category ID: ${categoryId}`);
+    } else if (categoryName) {
+        // Prioridad 2: Fallback por Nombre (Para otras rutas)
+        // Usamos ILIKE con comodines para manejar inconsistencias de la DB
+        query = query.ilike('categories.name', `%${categoryName}%`); 
+        console.log(`[DEBUG VORTEX POSTS] Aplicando filtro de Category Name (FALLBACK): "%${categoryName}%" (ILIKE)`);
     }
     
     if (subcategoryName) {

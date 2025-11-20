@@ -147,15 +147,6 @@ export async function generateMetadata({ params, searchParams }) {
 export default async function DynamicPostListPage({ params, searchParams }) {
     const supabase = createClient();
 
-    try {
-        const allCategories = await getCategories(supabase);
-        // Mapeamos para ver solo el nombre y slug, que son relevantes para el filtro
-        console.log('[DEBUG VORTEX] LISTA COMPLETA DE CATEGORÍAS EN DB:');
-        allCategories.forEach(c => console.log(`  - Name: "${c.name}", Slug: "${c.slug}"`));
-    } catch (e) {
-        console.error('[DEBUG VORTEX] Error al obtener categorías de la DB:', e);
-    }
-    // 👆 FIN DEL BLOQUE DE DEBUG
     
     const slugArray = params.slug || [];
     
@@ -169,7 +160,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // --- 1. Obtener datos de Taxonomía ---
     const taxData = await getTaxonomyData(slugArray);
 
-    // Si la taxonomía no es válida (ej: /weki-vortex), mostramos 404
+    // Si la taxonomía no es válida (ej: /wiki-vortex), mostramos 404
     if (!taxData) {
         notFound();
     }
@@ -186,12 +177,8 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     const normalizedCategoryName = categoryQuery ? categoryQuery.toLowerCase().trim() : null; 
     
     if (section.slug === 'explorar' && normalizedCategoryName) {
-        // Obtenemos la lista completa de categorías (incluye ID, name, slug)
         const allCategories = await getCategories(supabase);
-        
-        // Buscamos el ID por el nombre de la categoría, primero limpiando el nombre de la DB
         const foundCategory = allCategories.find(c => 
-            // Limpiamos la inconsistencia de la DB (espacios al final, etc.)
             c.name?.toLowerCase().trim() === normalizedCategoryName
         );
         
@@ -205,14 +192,14 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // --- FIN DE LÓGICA DE BÚSQUEDA DE CATEGORY ID ---
     
    
-    const normalizedCategoryQuery = categoryQuery ? categoryQuery.toLowerCase().trim() : null;
+    const normalizedSectionSlug = section.slug ? section.slug.toLowerCase().trim() : null;
 
 
 
 
 // 1. Define tus parámetros de consulta base
     let postParams = {
-        section: section.slug === 'explorar' ? null : section.slug,
+        section: normalizedSectionSlug === 'explorar' ? null : normalizedSectionSlug,
         categoryId: categoryIdToFilter,
         categoryName: null,
         subcategoryName: subcategory?.name,
@@ -227,6 +214,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // 2. Comprueba si estamos en la sección "Freemium"
     if (section.slug === 'zona-freemium') {
         // 3. ¡Sobrescribe los filtros!
+        postParams.categoryId = null;
         postParams.section = null;          // NO filtres por esta se   cción
         postParams.categoryName = null;     // NO filtres por categoría
         postParams.subcategoryName = null;  // NO filtres por subcategoría

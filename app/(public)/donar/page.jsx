@@ -7,13 +7,17 @@ import { useToast } from '@/app/components/ui/use-toast';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
-import { supabase } from '@/app/lib/customSupabaseClient';
+
+import { createClient } from '@/app/utils/supabase/client';
+
 import { getAllSiteContent, addPayment } from '@/app/lib/supabase/siteContent';
 import { Heart, CreditCard, Loader2 } from 'lucide-react';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 
 const DonatePage = () => {
+    const supabase = createClient();
+    
     const { toast } = useToast();
     const { user } = useAuth();
     const [config, setConfig] = useState({
