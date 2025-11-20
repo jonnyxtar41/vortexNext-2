@@ -179,8 +179,32 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // --- 2. Búsqueda y Paginación ---
     const page = parseInt(searchParams.page || '1', 10);
     const searchQuery = searchParams.q || '';
-    
+
+    // --- LÓGICA PARA BUSCAR CATEGORY ID ---
+    let categoryIdToFilter = null;
     const categoryQuery = searchParams.cat || null;
+    const normalizedCategoryName = categoryQuery ? categoryQuery.toLowerCase().trim() : null; 
+    
+    if (section.slug === 'explorar' && normalizedCategoryName) {
+        // Obtenemos la lista completa de categorías (incluye ID, name, slug)
+        const allCategories = await getCategories(supabase);
+        
+        // Buscamos el ID por el nombre de la categoría, primero limpiando el nombre de la DB
+        const foundCategory = allCategories.find(c => 
+            // Limpiamos la inconsistencia de la DB (espacios al final, etc.)
+            c.name?.toLowerCase().trim() === normalizedCategoryName
+        );
+        
+        if (foundCategory) {
+            categoryIdToFilter = foundCategory.id;
+            console.log(`[DEBUG VORTEX] Category ID encontrado para "${normalizedCategoryName}": ${categoryIdToFilter}`);
+        } else {
+            console.warn(`[DEBUG VORTEX] Category ID NO encontrado para "${normalizedCategoryName}". Esto podría indicar un error de datos en la DB.`);
+        }
+    }
+    // --- FIN DE LÓGICA DE BÚSQUEDA DE CATEGORY ID ---
+    
+   
     const normalizedCategoryQuery = categoryQuery ? categoryQuery.toLowerCase().trim() : null;
 
 
@@ -189,9 +213,8 @@ export default async function DynamicPostListPage({ params, searchParams }) {
 // 1. Define tus parámetros de consulta base
     let postParams = {
         section: section.slug === 'explorar' ? null : section.slug,
-        categoryName: (section.slug === 'explorar' && normalizedCategoryQuery) 
-            ? normalizedCategoryQuery // <-- ¡Usamos el valor limpio y minúscula!
-            : category?.name,
+        categoryId: categoryIdToFilter,
+        categoryName: null,
         subcategoryName: subcategory?.name,
         searchQuery: searchQuery,
         page: page,
