@@ -12,6 +12,51 @@ import PostClientPage from '@/app/components/PostClientPage';
 export const revalidate = 3600; 
 
 
+// Función Helper para construir el JSON-LD (Artículo)
+function generateArticleJsonLd(post) {
+    const siteUrl = 'https://zonavortex.com';
+    const postUrl = `${siteUrl}/post/${post.slug}`;
+    
+    // Se asume que 'post' tiene 'created_at' y 'updated_at' del backend (Supabase)
+    const datePublished = post.created_at || new Date().toISOString(); 
+    const dateModified = post.updated_at || datePublished; 
+
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        'mainEntityOfPage': {
+            '@type': 'WebPage',
+            '@id': postUrl,
+        },
+        'headline': post.title,
+        'description': post.excerpt,
+        'image': {
+            '@type': 'ImageObject',
+            'url': post.main_image_url || `${siteUrl}/logo.svg`,
+            'width': 1200,
+            'height': 630,
+        },
+        'datePublished': datePublished,
+        'dateModified': dateModified,
+        'author': {
+            '@type': 'Person', // O 'Organization' si es un autor genérico del sitio
+            'name': post.author?.name || 'Zona Vortex', // Utiliza el nombre del autor real si está disponible
+        },
+        'publisher': {
+            '@type': 'Organization',
+            'name': 'Zona Vortex',
+            'logo': {
+                '@type': 'ImageObject',
+                'url': `${siteUrl}/logo.svg`, // Asumiendo que el logo está en /public
+                'width': 60,
+                'height': 60,
+            },
+        },
+    };
+    
+    return JSON.stringify(jsonLd);
+}
+
 // --- Generación de Metadata (SEO) ---
 // (Tu función generateMetadata está perfecta, no la cambies)
 export async function generateMetadata({ params }) {
@@ -86,18 +131,27 @@ export default async function PostPage({ params }) {
     
     // --- 3. Renderizar Componente Cliente ---
     return (
-        <Suspense fallback={
-            <div className="container mx-auto h-screen flex items-center justify-center">
-                Cargando post...
-            </div>
-        }>
-            {/* Pasamos TODOS los datos al componente cliente */}
-            <PostClientPage 
-                post={post} 
-                relatedPosts={[]} // 'relatedPosts' ya no se usa, pasamos 'recommended' y 'similar'
-                recommendedPosts={recommendedPosts}
-                similarPosts={finalSimilarPosts}
+        <>
+            {/* INYECCIÓN DEL JSON-LD PARA SEO */}
+            <script 
+                type="application/ld+json" 
+                dangerouslySetInnerHTML={{ __html: jsonLd }}
             />
-        </Suspense>
+            {/* FIN JSON-LD */}
+
+            <Suspense fallback={
+                <div className="container mx-auto h-screen flex items-center justify-center">
+                    Cargando post...
+                </div>
+            }>
+                {/* Pasamos TODOS los datos al componente cliente */}
+                <PostClientPage 
+                    post={post} 
+                    relatedPosts={[]} // 'relatedPosts' ya no se usa, pasamos 'recommended' y 'similar'
+                    recommendedPosts={recommendedPosts}
+                    similarPosts={finalSimilarPosts}
+                />
+            </Suspense>
+        </>
     );
 }

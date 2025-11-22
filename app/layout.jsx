@@ -3,7 +3,7 @@ import { Providers } from './providers';
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="es" suppressHydrationWarning={true}>
       <body>
         <Providers>
           {children}

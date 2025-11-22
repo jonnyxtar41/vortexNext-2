@@ -15,7 +15,9 @@ El objetivo principal de esta migración es maximizar el SEO, el rendimiento y l
 
 * **Rutas Dinámicas:** Manejo de taxonomías flexibles (Sección, Categoría, Subcategoría) con rutas de captura (`[...slug]/page.jsx`).
 * **Máximo Rendimiento (Server Components):** Uso extensivo de Server Components para pre-renderizar la mayor parte de la UI en el servidor.
-* **SEO Óptimo (On-Demand ISR):** Los posts se generan estáticamente en el primer acceso y se mantienen en caché indefinidamente hasta que se revalidan manualmente.
+* **SEO Óptimo (On-Demand ISR) y Rich Snippets:**
+    * Implementación de metadatos dinámicos, URL canónicas y **datos estructurados (JSON-LD Article)** para artículos, asegurando la elegibilidad para **Rich Snippets** en las SERPs.
+    * Los posts se generan estáticamente en el primer acceso y se mantienen en caché indefinidamente hasta que se revalidan manualmente.
 * **Generación Estática en Build:** Implementación de `generateStaticParams` para pre-generar los posts más recientes en el momento del despliegue.
 * **Ruta de Administración Obfuscada:** La ruta del panel de control está protegida por una URL oculta y dinámica.
 

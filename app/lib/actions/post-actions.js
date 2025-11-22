@@ -8,6 +8,7 @@ import { JSDOM } from 'jsdom';
 import { createClient } from '@/app/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
+
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
@@ -67,6 +68,7 @@ export const addPost = async (postData) => {
 
 export const updatePost = async (postId, postData) => {
     const supabase = createClient();
+
     const { data: existingPost, error: fetchError } = await supabase
         .from('posts')
         .select('status')
@@ -100,6 +102,14 @@ export const updatePost = async (postId, postData) => {
     } else if (existingPost && existingPost.status === 'published' && sanitizedPostData.status === 'published') {
         await logActivity(supabase, `Usuario actualizó el recurso: "${sanitizedPostData.title}"`, { postId, changes: Object.keys(sanitizedPostData) });
     }
+    if (data && data.length > 0) {
+        const slug = data[0].slug;
+        revalidatePath(`/post/${slug}`); // 👈 Esta línea purga el caché del post
+        // También puede revalidar la página de listado (p. ej., /recursos) si es relevante
+        // revalidatePath('/recursos'); 
+    }
+    revalidatePath('/control-panel-7d8a2b3c4f5e/pending-posts');
+    revalidatePath('/control-panel-7d8a2b3c4f5e/manage-content');
 
     return { data, error: null };
 };
