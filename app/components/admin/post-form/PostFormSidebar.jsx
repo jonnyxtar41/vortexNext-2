@@ -2,14 +2,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Label } from '@/app/components/ui/label'; // Adjusted path
-import { Switch } from '@/app/components/ui/switch'; // Adjusted path
-import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group'; // Adjusted path
-import { Input } from '@/app/components/ui/input'; // Adjusted path
+import Label from '@/app/components/ui/label'; 
+import { Switch } from '@/app/components/ui/switch'; 
+import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group'; 
+import Input  from '@/app/components/ui/input'; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'; // Adjusted path
 import { useAuth } from '@/app/contexts/SupabaseAuthContext'; // Adjusted path
 import { DollarSign, Percent, CalendarClock, Save, Book, Trash2, Loader2, MessageSquare, Star } from 'lucide-react';
-import { Button } from '@/app/components/ui/button'; // Adjusted path
+import  Button  from '@/app/components/ui/button'; // Adjusted path
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/app/components/ui/dialog'; // Adjusted path
 import { useToast } from '@/app/components/ui/use-toast'; // Adjusted path
 import { createClient } from '@/app/utils/supabase/client';

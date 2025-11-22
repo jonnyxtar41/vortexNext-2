@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Cropper from 'react-easy-crop';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import { getCroppedImg } from '@/app/lib/utils'; // We'll create this utility function
-import { Label } from '@/app/components/ui/label';
+import  Label from '@/app/components/ui/label';
 import { Switch } from '@/app/components/ui/switch'; // Import Switch
 
 // This is a dummy comment to force module re-evaluation.

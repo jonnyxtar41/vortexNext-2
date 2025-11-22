@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowRight } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import Link from 'next/link';
 import AdLink from '@/app/components/AdLink';
 

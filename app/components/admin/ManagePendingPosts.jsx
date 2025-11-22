@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useToast } from '@/app/components/ui/use-toast';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import Link from 'next/link';
 import { Eye, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';

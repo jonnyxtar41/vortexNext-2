@@ -7,7 +7,7 @@ import { getAllPostStats, getPosts } from '@/app/lib/supabase/client';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
 import { BarChart as BarChartIcon, Eye, Download, Search, Filter, TrendingUp, FileText, Hash, Star } from 'lucide-react';
-import { Input } from '@/app/components/ui/input';
+import  Input  from '@/app/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { useToast } from '@/app/components/ui/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';

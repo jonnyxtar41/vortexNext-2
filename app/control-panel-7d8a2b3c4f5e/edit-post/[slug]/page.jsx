@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PostForm from '@/app/components/admin/PostForm'; // Corrected path
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
-import { Button } from '@/app/components/ui/button';
+import Button  from '@/app/components/ui/button';
 import { LogOut, ArrowLeft } from 'lucide-react';
 import { createClient } from '@/app/utils/supabase/client';
 

@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useLayout } from '@/app/context/LayoutContext.jsx';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/components/ui/dropdown-menu";
 import * as Icons from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 
 const Header = ({ sections = [], siteContent = {} }) => {
     const { isSidePanelOpen, toggleSidePanel } = useLayout();

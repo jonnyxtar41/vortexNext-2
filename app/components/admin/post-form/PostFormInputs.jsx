@@ -2,11 +2,11 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Input } from '@/app/components/ui/input'; // Adjusted path
+import  Input  from '@/app/components/ui/input'; // Adjusted path
 import { Textarea } from '@/app/components/ui/textarea'; // Adjusted path
-import { Label } from '@/app/components/ui/label'; // Adjusted path
+import  Label from '@/app/components/ui/label'; // Adjusted path
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'; // Adjusted path
-import { Button } from '@/app/components/ui/button'; // Adjusted path
+import  Button  from '@/app/components/ui/button'; // Adjusted path
 import { Sparkles } from 'lucide-react';
 import useAutosizeTextArea from '@/app/hooks/useAutosizeTextArea'; // Adjusted path
 

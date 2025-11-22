@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Input } from '@/app/components/ui/input';
+import  Input from '@/app/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import ManagePostsList from '@/app/components/admin/ManagePostsList';
 import ManageCategories from '@/app/components/admin/ManageCategories';
@@ -16,11 +16,11 @@ import { updatePostEditStatusAction } from '@/app/actions/posts';
 import { updatePost } from '@/app/lib/actions/post-actions';
 import { getCategories } from '@/app/lib/supabase/categories';
 import { getSections } from '@/app/lib/supabase/sections';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import { useToast } from '@/app/components/ui/use-toast';
 import { getSubcategories } from '@/app/lib/supabase/subcategories';
 import { Switch } from '@/app/components/ui/switch';
-import { Label } from '@/app/components/ui/label';
+import  Label from '@/app/components/ui/label';
 import Link from 'next/link';
 import { createClient } from '@/app/utils/supabase/client';
 

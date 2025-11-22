@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/app/utils/supabase/client';
-import { Input } from '@/app/components/ui/input';
-import { Button } from '@/app/components/ui/button';
+import  Input from '@/app/components/ui/input';
+import  Button  from '@/app/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/components/ui/dialog';
 import { Search } from 'lucide-react';
 

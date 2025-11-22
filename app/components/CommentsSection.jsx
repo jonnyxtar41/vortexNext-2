@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getCommentsByPostId, addComment } from '@/app/lib/supabase/comments';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import { Textarea } from '@/app/components/ui/textarea';
-import { Input } from '@/app/components/ui/input';
+import  Input from '@/app/components/ui/input';
 import { useToast } from '@/app/components/ui/use-toast';
 import { Loader2, Send } from 'lucide-react';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';

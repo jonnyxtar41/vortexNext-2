@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, Users, BookOpen } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import Link from 'next/link';
 
 const Hero = ({ heroImageUrl }) => {

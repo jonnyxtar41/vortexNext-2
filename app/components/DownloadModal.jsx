@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/app/components/ui/dialog";
-import { Button } from "@/app/components/ui/button";
+import  Button  from "@/app/components/ui/button";
 import { useDownloadModal } from "@/app/context/DownloadModalContext";
 import AdBlock from '@//app/components/AdBlock';
 import { FolderHeart as HandHeart, Coffee, Download, Loader2 } from 'lucide-react';

@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; 
 import Link from 'next/link'; 
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
+import Button  from '@/app/components/ui/button';
+import  Input  from '@/app/components/ui/input';
+import Label from '@/app/components/ui/label';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 

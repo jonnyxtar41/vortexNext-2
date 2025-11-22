@@ -10,7 +10,7 @@ import {
     ChevronsRight, FileDown, ChevronRight, Facebook, 
     Twitter, Linkedin, Copy, MessageCircle 
 } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import { useToast } from "@/app/components/ui/use-toast";
 import { incrementPostStat } from '@/app/lib/supabase/client';
 import AdBlock from '@/app/components/AdBlock';

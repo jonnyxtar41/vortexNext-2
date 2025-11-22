@@ -2,8 +2,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Input } from '@/app/components/ui/input'; // Adjusted path
-import { Button } from '@/app/components/ui/button'; // Adjusted path
+import  Input from '@/app/components/ui/input'; // Adjusted path
+import  Button  from '@/app/components/ui/button'; // Adjusted path
 import { X, PlusCircle } from 'lucide-react';
 
 const KeywordInput = ({ keywords, setKeywords, defaultKeywords }) => {

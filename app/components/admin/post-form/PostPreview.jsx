@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, User, ChevronsRight, Smartphone, Monitor } from 'lucide-react';
 import parse from 'html-react-parser';
-import { Button } from '@/app/components/ui/button'; // Adjusted path
+import  Button  from '@/app/components/ui/button'; // Adjusted path
 import { cn } from '@/app/lib/utils'; // Adjusted path
 
 const PostPreview = ({ postData, sectionData, categoryData, subcategoryData }) => {

@@ -4,9 +4,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/app/components/ui/use-toast';
-import { Button } from '@/app/components/ui/button';
-import { Label } from '@/app/components/ui/label';
-import { Input } from '@/app/components/ui/input';
+import Button  from '@/app/components/ui/button';
+import Label  from '@/app/components/ui/label';
+import  Input  from '@/app/components/ui/input';
 import { Textarea } from '@/app/components/ui/textarea';
 import { Save, FileText, PlusCircle, Trash2, Upload, Bell, Image as ImageIcon, Search } from 'lucide-react';
 import { getAllSiteContent, updateSiteContent } from '@/app/lib/supabase/siteContent';

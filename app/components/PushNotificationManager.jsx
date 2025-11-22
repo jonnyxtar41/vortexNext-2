@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import { useToast } from '@/app/components/ui/use-toast';
 import { Bell, X } from 'lucide-react';
 

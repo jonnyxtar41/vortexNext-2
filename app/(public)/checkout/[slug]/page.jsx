@@ -4,14 +4,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import { useToast } from '@/app/components/ui/use-toast';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import { createClient } from '@/app/utils/supabase/client';
 import { getAllSiteContent, addPayment, getPostBySlug } from '@/app/lib/supabase/client';
 import { ShoppingCart, CreditCard, Loader2, Tag } from 'lucide-react';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
+import  Input from '@/app/components/ui/input';
+import  Label from '@/app/components/ui/label';
 import { useCallback } from 'react';
 
 const supabase = createClient();

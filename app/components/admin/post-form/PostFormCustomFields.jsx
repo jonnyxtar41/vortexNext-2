@@ -2,10 +2,10 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/app/components/ui/button'; // Adjusted path
-import { Input } from '@/app/components/ui/input'; // Adjusted path
+import  Button  from '@/app/components/ui/button'; // Adjusted path
+import  Input  from '@/app/components/ui/input'; // Adjusted path
 import { Trash2, PlusCircle } from 'lucide-react';
-import { Label } from '@/app/components/ui/label'; // Adjusted path
+import  Label  from '@/app/components/ui/label'; // Adjusted path
 
 const PostFormCustomFields = ({ customFields, setCustomFields }) => {
     const handleAddField = () => {

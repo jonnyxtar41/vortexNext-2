@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/app/components/ui/use-toast';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
+import  Button  from '@/app/components/ui/button';
+import  Input  from '@/app/components/ui/input';
+import  Label  from '@/app/components/ui/label';
 import { Palette, Save, PlusCircle, Trash2, Edit } from 'lucide-react';
 import { predefinedThemes, getCustomThemes, saveCustomThemes } from '@/app/lib/themes';
 import { useTheme } from 'next-themes';

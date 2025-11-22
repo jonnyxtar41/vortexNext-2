@@ -9,8 +9,8 @@ import Link from 'next/link'; // Importante: usar next/link
 // Componentes UI (los mismos de tu proyecto)
 import { motion } from 'framer-motion';
 import { Calendar, User, Search, FileDown } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
+import  Button  from '@/app/components/ui/button';
+import  Input from '@/app/components/ui/input';
 import AdLink from '@/app/components/AdLink';
 import AdBlock from '@/app/components/AdBlock';
 import Pagination from '@/app/components/Pagination';

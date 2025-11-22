@@ -8,9 +8,9 @@ import { getPayments, getAllSiteContent, updateSiteContent } from '@/app/lib/sup
 import { DollarSign, CheckCircle, XCircle, Clock, Save, CreditCard, Info, Heart, Filter, Download, Repeat, MessageSquare, Banknote, Bitcoin } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
+import  Button  from '@/app/components/ui/button';
+import  Input  from '@/app/components/ui/input';
+import  Label  from '@/app/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/app/components/ui/alert";
 import { Textarea } from '@/app/components/ui/textarea';

@@ -7,7 +7,7 @@ import { createClient } from '@/app/utils/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Lightbulb, Mail, Clock, RefreshCw, Trash2 } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { useToast } from '@/app/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog";

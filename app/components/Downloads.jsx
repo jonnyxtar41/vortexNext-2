@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Download, FileText, ArrowRight } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import AdBlock from '@/app/components/AdBlock';
 import Link from 'next/link';
 

@@ -4,9 +4,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { LogIn, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
+import  Button  from '@/app/components/ui/button';
+import  Input from '@/app/components/ui/input';
+import  Label from '@/app/components/ui/label';
 import { useToast } from '@/app/components/ui/use-toast';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import Link from 'next/link';

@@ -7,7 +7,7 @@ import { createClient } from '@/app/utils/supabase/client';
 import { useToast } from '@/app/components/ui/use-toast';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { Database, Server, HardDrive, RefreshCw, AlertTriangle, CheckCircle, Table, Key, Link2, Share2 } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 
 const StatCard = ({ title, value, icon, status, unit }) => {
     const statusColor = status === 'ok' ? 'text-green-400' : 'text-yellow-400';

@@ -6,7 +6,7 @@ import { useToast } from '@/app/components/ui/use-toast';
 
 import { deletePostAction } from '@/app/actions/posts';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
-import { Button } from '@/app/components/ui/button';
+import  Button  from '@/app/components/ui/button';
 import Link from 'next/link';
 import { Eye, Edit, Trash2, Clock } from 'lucide-react';
 import { format } from 'date-fns';

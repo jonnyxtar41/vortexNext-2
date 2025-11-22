@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { useToast } from '@/app/components/ui/use-toast';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
+import  Button from '@/app/components/ui/button';
+import Input  from '@/app/components/ui/input';
+import  Label from '@/app/components/ui/label';
 import { KeyRound } from 'lucide-react';
 
 const ManageCredentials = () => {

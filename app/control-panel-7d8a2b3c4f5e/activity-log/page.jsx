@@ -7,8 +7,8 @@ import { createClient } from '@/app/utils/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { BookOpen, Clock, RefreshCw, Search, AlertTriangle } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
+import Button from '@/app/components/ui/button';
+import  Input from '@/app/components/ui/input';
 import { useToast } from '@/app/components/ui/use-toast';
 import { Badge } from '@/app/components/ui/badge'; // (Asumo que tienes este componente de UI)
 
