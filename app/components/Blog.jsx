@@ -1,3 +1,4 @@
+//app\components\Blog.jsx
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -25,7 +26,8 @@ const Blog = ({ randomPosts = [] }) => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-20 justify-center">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-20 justify-center">
+        
           {randomPosts.map((post, index) => (
             
             <AdLink key={post.id} href={`/post/${post.slug}`} className="cursor-pointer group flex justify-center">
@@ -99,7 +101,7 @@ const Blog = ({ randomPosts = [] }) => {
             className="text-center mt-20"
         >
             <Button asChild className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-full text-base font-semibold">
-                <Link href="/recursos">Ver todos los recursos</Link>
+                <Link href="/explorar">Ver todos los recursos</Link>
             </Button>
         </motion.div>
 

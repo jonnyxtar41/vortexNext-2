@@ -8,7 +8,7 @@ import { createClient } from '@/app/utils/supabase/server';
 
 import { getCategories } from '@/app/lib/supabase/categories'; // Temporal, si necesitas categorías
 
-const POSTS_PER_PAGE = 9;
+const POSTS_PER_PAGE = 15;
 
 async function getTaxonomyData(slugArray) {
     const supabase = createClient();

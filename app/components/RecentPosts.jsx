@@ -41,7 +41,7 @@ const RecentPosts = ({ posts = [] }) => {
         </motion.div>
 
         <motion.div
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -67,7 +67,7 @@ const RecentPosts = ({ posts = [] }) => {
                   <h3 className="text-2xl font-bold mb-3 text-foreground flex-grow">
                     {post.title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed mb-4">
+                  <p className="text-muted-foreground leading-relaxed mb-2 line-clamp-3">
                     {post.excerpt}
                   </p>
                   <div className="flex justify-between items-center text-sm text-text-subtle mt-auto pt-4 border-t border-white/10">

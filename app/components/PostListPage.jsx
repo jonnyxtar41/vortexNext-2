@@ -137,7 +137,7 @@ const PostListPage = ({
                         <AdBlock className="mb-16" />
 
                         {/* --- Grid de Posts --- */}
-                        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-12">
+                        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-12">
                             {initialPosts.map((post, index) => (
                                 <motion.div
                                     key={`${post.id}-${index}`}
@@ -166,7 +166,8 @@ const PostListPage = ({
                                             <h3 className="text-2xl font-bold mb-3 text-foreground flex-grow">
                                                 {post.title}
                                             </h3>
-                                            <p className="text-muted-foreground leading-relaxed mb-4">
+                                            {/* MODIFICACIÓN: Se añade line-clamp-2 y se reduce el margen a mb-2 */}
+                                            <p className="text-muted-foreground leading-relaxed mb-2 line-clamp-2">
                                                 {post.excerpt}
                                             </p>
                                             <div className="flex justify-between items-center text-sm text-text-subtle mt-auto pt-4 border-t border-border">

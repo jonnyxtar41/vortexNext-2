@@ -5,6 +5,8 @@ import { getCategories } from '@/app/lib/supabase/categories';
 import { getFeaturedPosts, getDownloadablePosts, getAllSiteContent } from '@/app/lib/supabase/client';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 
+import WaveSeparator from '@/app/components/WaveSeparator';
+
 const LoadingSection = () => (
   <div className="w-full py-20 flex items-center justify-center bg-background/50">
     <LoadingSpinner className="text-primary" />
@@ -19,6 +21,7 @@ const AdBlock = dynamic(() => import('@/app/components/AdBlock'), { loading: () 
 
 const Home = async () => {
   const supabase = createClient();
+
   const [categoriesData, featuredPosts, downloadablePostsData, allContent] = await Promise.all([
     getCategories(supabase),
     getFeaturedPosts(supabase, { limit: 6 }),
@@ -48,8 +51,8 @@ const Home = async () => {
 
   const shuffledCategories = shuffleArray([...serializableCategories]);
   
-  const blogPostsData = serializableFeatured.filter(p => p.main_image_url).slice(0, 3);
-  const recentPostsData = serializableFeatured.slice(0, 3);
+  const blogPostsData = serializableFeatured.filter(p => p.main_image_url).slice(0, 4);
+  const recentPostsData = serializableFeatured.slice(0, 4);
 
 
   const homeData = {
@@ -63,6 +66,7 @@ const Home = async () => {
   return (
     <>
       <Hero heroImageUrl={homeData.siteContent.hero_image_url} />
+      <WaveSeparator />
       <Features categories={homeData.categories} />
       <Blog randomPosts={homeData.blogPosts} />
       <AdBlock className="container mx-auto" />

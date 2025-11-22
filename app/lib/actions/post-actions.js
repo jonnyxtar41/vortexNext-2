@@ -9,61 +9,80 @@ import { createClient } from '@/app/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 
-const window = new JSDOM('').window;
-const DOMPurify = createDOMPurify(window);
 
 const sanitizeContent = (html) => {
     if (!html) return null;
-    const sanitized = DOMPurify.sanitize(html, {
-        ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div', 'h1', 'h2', 'h3', 'p', 'b', 'i', 'u', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'img', 'br', 'blockquote', 'span'],
-        ADD_ATTR: ['style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title', 'data-align', 'data-youtube-video', 'href', 'alt', 'target', 'rel'],
-        FORBID_TAGS: [],
-        FORBID_ATTR: [],
-        ADD_HOOKS: {
-            afterSanitizeAttributes: (node) => {
-                if (node.tagName.toLowerCase() === 'iframe') {
-                    const src = node.getAttribute('src');
-                    if (src) {
-                        try {
-                            const url = new URL(src);
-                            if (url.hostname !== 'www.youtube.com' && url.hostname !== 'youtube.com' && url.hostname !== 'www.youtube-nocookie.com') {
+
+
+    try {
+        const window = new JSDOM('').window;
+        const DOMPurify = createDOMPurify(window);
+
+
+            
+        const sanitized = DOMPurify.sanitize(html, {
+            ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div', 'h1', 'h2', 'h3', 'p', 'b', 'i', 'u', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'img', 'br', 'blockquote', 'span'],
+            ADD_ATTR: ['style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title', 'data-align', 'data-youtube-video', 'href', 'alt', 'target', 'rel'],
+            FORBID_TAGS: [],
+            FORBID_ATTR: [],
+            ADD_HOOKS: {
+                afterSanitizeAttributes: (node) => {
+                    if (node.tagName.toLowerCase() === 'iframe') {
+                        const src = node.getAttribute('src');
+                        if (src) {
+                            try {
+                                const url = new URL(src);
+                                if (url.hostname !== 'www.youtube.com' && url.hostname !== 'youtube.com' && url.hostname !== 'www.youtube-nocookie.com') {
+                                    node.removeAttribute('src');
+                                }
+                            } catch (e) {
                                 node.removeAttribute('src');
                             }
-                        } catch (e) {
-                            node.removeAttribute('src');
                         }
                     }
                 }
             }
-        }
-    });
-    return sanitized;
+        });
+        return sanitized;
+    } catch (e) {
+        console.error("Error during server-side sanitization:", e);
+        // Si la sanitización falla por completo, al menos devolvemos el contenido sin procesar
+        // Opcional: throw new Error("Sanitization failed due to environment error.");
+        return html; 
+    }
+    
 };
 
 export const addPost = async (postData) => {
     const supabase = createClient();
+    
     const sanitizedPostData = {
         ...postData,
         content: sanitizeContent(postData.content)
     };
 
-    const { data, error } = await supabase
-        .from('posts')
-        .insert([sanitizedPostData])
-        .select();
+    try {
+        const { data, error } = await supabase
+            .from('posts')
+            .insert([sanitizedPostData])
+            .select();
 
-    if (error) {
-        console.error('Error adding post:', error);
-        throw new Error(error.message);
-    }
+        if (error) {
+            console.error('--- ERROR EN INSERCIÓN SUPABASE ---', error);
+            throw new Error(error.message);
+        }
     
-    if (data && data.length > 0 && sanitizedPostData.status === 'published') {
-        await logActivity(supabase, `Usuario creó un nuevo recurso: "${sanitizedPostData.title}"`, { status: sanitizedPostData.status, postId: data[0].id });
-        const postUrl = `/blog/${data[0].slug}`;
-        await sendSuperadminNotificationEmail(supabase, sanitizedPostData.title, postUrl);
-    }
-
-    return { data, error: null };
+        if (data && data.length > 0 && sanitizedPostData.status === 'published') {
+            await logActivity(supabase, `Usuario creó un nuevo recurso: "${sanitizedPostData.title}"`, { status: sanitizedPostData.status, postId: data[0].id });
+            const postUrl = `/blog/${data[0].slug}`;
+            await sendSuperadminNotificationEmail(supabase, sanitizedPostData.title, postUrl);
+        }
+        console.log('--- FIN DEBUG: ÉXITO EN DB INSERT ---');
+        return { data, error: null };
+        } catch (e) {
+                console.error('--- FIN DEBUG: ERROR GENERAL EN ACTION ---', e);
+                throw e;
+        }
 };
 
 export const updatePost = async (postId, postData) => {

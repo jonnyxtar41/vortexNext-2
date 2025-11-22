@@ -36,6 +36,7 @@ const Hero = ({ heroImageUrl }) => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold pulse-glow">
                 <Link href="/explorar">
+                
                   <BookOpen className="w-5 h-5 mr-2" />
                   Explorar Contenido
                 </Link>

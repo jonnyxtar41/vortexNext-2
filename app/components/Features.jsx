@@ -28,7 +28,7 @@ const iconMap = {
 
 const Features = ({ categories = [] }) => {
   return (
-    <section className="py-20 px-6 bg-black/20">
+   <section className="py-20 px-6 bg-[#C7C7C7]">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
