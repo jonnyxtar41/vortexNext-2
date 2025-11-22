@@ -100,13 +100,15 @@ export default async function PostPage({ params }) {
     console.log('--- DEBUG SLUG DESTINO ---');
     console.log('Slug recibido por la ruta dinámica:', slug);
     console.log('--------------------------');
-    
+
     // --- 1. Cargar Datos del Post ---
     const post = await getPostBySlug(supabase, slug);
     
     if (!post) {
         notFound();
     }
+
+    const jsonLd = generateArticleJsonLd(post);
 
     // --- 2. Cargar Posts Relacionados y Recomendados (Lógica de Vite migrada al servidor) ---
     const [

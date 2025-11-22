@@ -48,7 +48,7 @@ const RecentPosts = ({ posts = [] }) => {
           viewport={{ once: true, amount: 0.2 }}
         >
           {posts.map((post) => (
-            <AdLink key={post.id} href={`/${post.sections?.slug || 'blog'}/${post.slug}`}>
+            <AdLink key={post.id} href={`/post/${post.slug}`}>
               <motion.div
                 variants={itemVariants}
                 className="glass-effect rounded-2xl overflow-hidden flex flex-col group card-hover h-full"

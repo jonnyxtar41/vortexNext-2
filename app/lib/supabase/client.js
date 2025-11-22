@@ -140,6 +140,7 @@ export const getPendingEdits = async (supabase) => {
 
 
 export const getPostBySlug = async (supabase, slug) => {
+    console.log(`[DEBUG SUPABASE] Buscando post con slug: "${slug}"`);
     const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -154,7 +155,7 @@ export const getPostBySlug = async (supabase, slug) => {
         .maybeSingle();
 
     if (error) {
-        console.error('Error fetching post by slug:', error);
+        console.error('[DEBUG SUPABASE] Error fetching post by slug:', error);
         return null;
     }
     
@@ -179,7 +180,7 @@ export const getRelatedPosts = async (supabase, postId, keywords, limit = 3) => 
         console.error('Error fetching related posts:', error);
         return [];
     }
-    
+  
     return data;
 };
 

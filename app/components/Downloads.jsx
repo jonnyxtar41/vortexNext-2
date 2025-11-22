@@ -58,7 +58,7 @@ const Downloads = ({ posts = [] }) => {
                   {post.excerpt}
                 </p>
                 <div className="mt-auto">
-                   <Link href={`/${post.sections?.slug || 'blog'}/${post.slug}`}>
+                   <Link href={`/post/${post.slug}`}>
                     <Button
                       variant="outline"
                       className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
