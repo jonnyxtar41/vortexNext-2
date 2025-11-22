@@ -63,9 +63,7 @@ const Features = ({ categories = [] }) => {
                     ? `/explorar?cat=${encodeURIComponent(categoryName)}`
                     : '/explorar';
                     
-                // AGREGAR ESTE CONSOLE.LOG PARA VERIFICAR LA URL GENERADA EN LA CONSOLA DEL CLIENTE
-                console.log(`[DEBUG ZONA VORTEX] Clic en categoría: "${categoryName}" -> Enlace generado: "${targetHref}"`);
-                // --- FIN DE CAMBIO PARA ROBUSTEZ Y DEBUG ---
+            
             
             return (
               <motion.div

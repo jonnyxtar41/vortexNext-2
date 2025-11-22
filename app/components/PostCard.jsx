@@ -6,7 +6,10 @@ import { FileDown } from 'lucide-react';
 
 // Este es el PostCard que estaba definido en tu Post.jsx de Vite
 const PostCard = ({ post, section }) => (
-    <AdLink href={`/${section}/${post.slug}`} className="block group">
+
+
+    
+    <AdLink href={`/post/${post.slug}`} className="block group">
     <div className="glass-effect p-4 rounded-lg transition-all duration-300 hover:bg-white/10 hover:scale-105 h-full flex flex-col">
         <div className="relative w-full aspect-video rounded-md mb-4 overflow-hidden">
         <img

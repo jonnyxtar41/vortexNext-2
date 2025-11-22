@@ -150,6 +150,12 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     
     const slugArray = params.slug || [];
     
+    // Si el primer segmento es 'post', esta ruta catch-all debe ignorarlo
+    // para evitar colisiones con la ruta canónica de posts.
+    if (slugArray[0] === 'post') {
+        notFound();
+    }
+    
     
     // Evita que esta ruta dinámica capture rutas reservadas de la aplicación.
     const RESERVED_PATHS = ['admin', 'control-panel-7d8a2b3c4f5e', 'login', 'register', 'auth', 'edit-post', 'forgot-password', 'update-password'];
@@ -214,7 +220,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
     // 2. Comprueba si estamos en la sección "Freemium"
     if (section.slug === 'zona-freemium') {
         // 3. ¡Sobrescribe los filtros!
-        postParams.categoryId = null;
+        postParams.categoryId = null;   
         postParams.section = null;          // NO filtres por esta se   cción
         postParams.categoryName = null;     // NO filtres por categoría
         postParams.subcategoryName = null;  // NO filtres por subcategoría
