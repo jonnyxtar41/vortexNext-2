@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, Link } from 'next/navigation';
+import { useRouter } from 'next/navigation'; 
+import Link from 'next/link'; 
 import { useAuth } from '@/app/contexts/SupabaseAuthContext';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
