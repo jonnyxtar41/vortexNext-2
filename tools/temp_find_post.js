@@ -17,8 +17,6 @@ const findPostBySlug = async () => {
 
   if (data) {
     console.log('Found post:');
-    console.log(`  ID: ${data.id}`);
-    console.log(`  Title: ${data.title}`);
   } else {
     console.log('Post not found.');
   }

@@ -30,16 +30,16 @@ const CheckoutPage = () => {
     const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
-        console.log('CheckoutPage useEffect started');
+        
         const fetchData = async () => {
-            console.log('fetchData called');
+         
             try {
-                console.log('Calling getPostBySlug and getAllSiteContent');
+              
                 const [postData, allContent] = await Promise.all([
                     getPostBySlug(supabase, postSlug),
                     getAllSiteContent(supabase),
                 ]);
-                console.log('getPostBySlug and getAllSiteContent completed');
+            
 
                 if (!postData || !postData.is_premium) {
                     toast({ title: 'Recurso no válido', description: 'Este recurso no está a la venta.', variant: 'destructive' });
@@ -72,7 +72,7 @@ const CheckoutPage = () => {
                 toast({ title: 'Error', description: 'No se pudo cargar la información del producto.', variant: 'destructive' });
                 router.push('/');
             } finally {
-                console.log('Setting loading to false');
+          
                 setLoading(false);
             }
         };

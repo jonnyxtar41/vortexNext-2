@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
             },
         });
 
-        console.log('Starting orphan image cleanup...');
+       
 
         // 1. Fetch all main_image_url values from the posts table
         const { data: posts, error: postsError } = await supabase
@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
                 .map((post) => post.main_image_url)
                 .filter(Boolean) // Filter out null or empty URLs
         );
-        console.log(`Found ${referencedImageUrls.size} referenced image URLs.`);
+        
 
         // 2. List all files in the 'site-assets' bucket
         const { data: files, error: filesError } = await supabase.storage
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
             }
         }
 
-        console.log(`Found ${orphanFilesToDelete.length} orphan files to delete.`);
+        
 
         // 3. Delete orphan images
         if (orphanFilesToDelete.length > 0) {
@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
                     status: 500,
                 });
             }
-            console.log(`Successfully deleted ${orphanFilesToDelete.length} orphan files.`);
+            
         } else {
             console.log('No orphan files found. Nothing to delete.');
         }

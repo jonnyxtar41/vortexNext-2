@@ -143,7 +143,7 @@ export const uploadBase64Image = async (supabase, dataUrl, folder = 'post-main-i
         console.error('Error getting public URL for uploaded image:', publicUrlError);
         return null;
     }
-    console.log('Supabase public URL data:', publicUrlData);
+    
 
     return publicUrlData.publicUrl;
 };

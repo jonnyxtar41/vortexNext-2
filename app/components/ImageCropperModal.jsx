@@ -28,7 +28,7 @@ const ImageCropperModal = ({ imageUrl, open, onOpenChange, onCropComplete, initi
 
     const showCroppedImage = useCallback(async () => {
         try {
-            console.log('showCroppedImage called with:', { imageUrl, croppedAreaPixels });
+          
             const croppedImage = await getCroppedImg(
                 imageUrl,
                 croppedAreaPixels

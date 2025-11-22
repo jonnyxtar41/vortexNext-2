@@ -51,7 +51,7 @@ const PushNotificationManager = ({ frequencyDays = 30 }) => {
   useEffect(() => {
     const checkNotificationStatus = () => {
       if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-        console.log('Las notificaciones push no son compatibles con este navegador.');
+  
         return;
       }
 

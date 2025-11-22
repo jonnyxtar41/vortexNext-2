@@ -96,11 +96,7 @@ export default async function PostPage({ params }) {
     const supabase = createClient();
     const { slug } = params;
 
-    // 🎯 AGREGAR ESTE LOG
-    console.log('--- DEBUG SLUG DESTINO ---');
-    console.log('Slug recibido por la ruta dinámica:', slug);
-    console.log('--------------------------');
-
+ 
     // --- 1. Cargar Datos del Post ---
     const post = await getPostBySlug(supabase, slug);
     

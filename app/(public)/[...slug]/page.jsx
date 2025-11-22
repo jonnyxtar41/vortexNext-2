@@ -188,12 +188,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
             c.name?.toLowerCase().trim() === normalizedCategoryName
         );
         
-        if (foundCategory) {
-            categoryIdToFilter = foundCategory.id;
-            console.log(`[DEBUG VORTEX] Category ID encontrado para "${normalizedCategoryName}": ${categoryIdToFilter}`);
-        } else {
-            console.warn(`[DEBUG VORTEX] Category ID NO encontrado para "${normalizedCategoryName}". Esto podría indicar un error de datos en la DB.`);
-        }
+     
     }
     // --- FIN DE LÓGICA DE BÚSQUEDA DE CATEGORY ID ---
     
@@ -215,7 +210,7 @@ export default async function DynamicPostListPage({ params, searchParams }) {
         onlyDownloadable: false, // Default a false
         isPremium: null          // Default a null (usa el filtro de client.js)
     };
-    console.log('[DEBUG VORTEX] Parámetros de PostQuery FINAL:', postParams);
+  
 
     // 2. Comprueba si estamos en la sección "Freemium"
     if (section.slug === 'zona-freemium') {

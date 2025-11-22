@@ -134,7 +134,7 @@ function extractHelmetData(content, filePath, routes) {
 
 // --- NUEVA FUNCIÓN PARA OBTENER POSTS DE SUPABASE ---
 async function extractDynamicPostPages() {
-    console.log('Fetching dynamic posts from Supabase...');
+    
     const { data: posts, error } = await supabase
         .from('posts')
         .select('slug, meta_title, title, meta_description, excerpt, sections(slug)')
@@ -145,7 +145,7 @@ async function extractDynamicPostPages() {
         return [];
     }
 
-    console.log(`Found ${posts.length} published posts.`);
+    
     return posts.map(post => ({
         url: `/${post.sections?.slug || 'blog'}/${post.slug}`,
         title: post.meta_title || post.title,
@@ -214,7 +214,7 @@ async function main() {
 
   ensureDirectoryExists(path.dirname(outputPath));
   fs.writeFileSync(outputPath, llmsTxtContent, 'utf8');
-  console.log(`✅ llms.txt generated successfully with ${allPages.length} pages.`);
+  
 }
 
 const isMainModule = import.meta.url === `file://${process.argv[1]}`;

@@ -51,7 +51,6 @@ const Features = ({ categories = [] }) => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category, index) => {
                 // Normalizamos el nombre para buscar el icono (minúsculas)
-                // console.log("Categorias:",category); // Mantener este o el nuevo para depurar
                 const iconKey = category.name?.toLowerCase() || 'default';
                 const Icon = iconMap[iconKey] || iconMap.default;
                 

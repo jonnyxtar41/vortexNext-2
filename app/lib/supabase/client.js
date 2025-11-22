@@ -31,7 +31,7 @@ export const getPosts = async (supabase, {
     includePending = false
 }) => {
 
-    console.log(`[DEBUG VORTEX POSTS] Recibida categoría: "${categoryName}"`);
+
     
     let query = supabase
         .from('posts')
@@ -58,50 +58,49 @@ export const getPosts = async (supabase, {
 
     if (section) {
         query = query.ilike('sections.slug', `%${section}%`); 
-        console.log(`[DEBUG VORTEX POSTS] Filtrando por sección en query: "%${section}%" (ILIKE)`);
+      
     }
 
     if (categoryName) {
         
         query = query.ilike('categories.name', `%${categoryName}%`);
-        console.log(`[DEBUG VORTEX POSTS] Filtrando por categoría en query: "${categoryName}"`);
+   
     }
     if (categoryId) {
         // Prioridad 1: Filtrar por ID (El más estable y directo)
         query = query.eq('category_id', categoryId);
-        console.log(`[DEBUG VORTEX POSTS] Aplicando filtro de Category ID: ${categoryId}`);
+
     } else if (categoryName) {
         // Prioridad 2: Fallback por Nombre (Para otras rutas)
         // Usamos ILIKE con comodines para manejar inconsistencias de la DB
         query = query.ilike('categories.name', `%${categoryName}%`); 
-        console.log(`[DEBUG VORTEX POSTS] Aplicando filtro de Category Name (FALLBACK): "%${categoryName}%" (ILIKE)`);
+     
     }
     
     if (subcategoryName) {
         query = query.eq('subcategories.name', subcategoryName); 
-        console.log(`[DEBUG VORTEX POSTS] Filtrando por subcategoría en query: "${subcategoryName}"`);
+     
     }
     
     if (searchQuery) {
         query = query.ilike('title', `%${searchQuery}%`);
-        console.log(`[DEBUG VORTEX POSTS] Filtrando por búsqueda en query: "${searchQuery}"`);
+    
     }
 
     if (onlyDownloadable) {
         query = query.not('download', 'is', null);
-        console.log(`[DEBUG VORTEX POSTS] Filtrando solo posts descargables.`);
+    
     }
     
     if (isPremium !== null) {
         query = query.eq('is_premium', isPremium);
-        console.log(`[DEBUG VORTEX POSTS] Filtrando por isPremium en query: "${isPremium}"`);
+    
     }
 
     if (!all) {
         const from = (page - 1) * limit;
         const to = page * limit - 1;
         query = query.range(from, to);
-        console.log(`[DEBUG VORTEX POSTS] Aplicando paginación: from ${from} to ${to}`);
     }
 
     const { data, error, count } = await query;
@@ -140,7 +139,7 @@ export const getPendingEdits = async (supabase) => {
 
 
 export const getPostBySlug = async (supabase, slug) => {
-    console.log(`[DEBUG SUPABASE] Buscando post con slug: "${slug}"`);
+   
     const { data, error } = await supabase
         .from('posts')
         .select(`

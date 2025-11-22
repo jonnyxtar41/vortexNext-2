@@ -52,12 +52,6 @@ const Home = async () => {
   const recentPostsData = serializableFeatured.slice(0, 3);
 
 
-  // 🎯 AGREGAR ESTOS LOGS
-  console.log('--- DEBUG SLUGS HOME PAGE ---');
-  console.log('Slugs Blog Posts (para componente <Blog>):', blogPostsData.map(p => p.slug));
-  console.log('Slugs Recent Posts (para componente <RecentPosts>):', recentPostsData.map(p => p.slug));
-  console.log('-----------------------------');
-
   const homeData = {
     categories: shuffledCategories.slice(0, 6),
     blogPosts: blogPostsData,
