@@ -2,7 +2,7 @@ import { createClient } from '@/app/utils/supabase/server';
 import { getPublishedPostsSlugs } from '@/app/lib/supabase/posts'; 
 
 
-export const revalidate = 86400;
+export const revalidate = 7600;
 
 // URL base de tu sitio
 const BASE_URL = 'https://zonavortex.com';
@@ -28,11 +28,12 @@ export default async function sitemap() {
     
 
     const postsUrls = posts.map(post => {
+        
         const cleanedPostSlug = generateSlug(post.slug);
      
         
         return {
-            url: `${BASE_URL}/${sectionSlug}/${cleanedPostSlug}`,
+            url: `${BASE_URL}/post/${cleanedPostSlug}`,
             
             lastModified: post.created_at ? new Date(post.created_at).toISOString() : new Date().toISOString(),
             changeFrequency: 'weekly',
