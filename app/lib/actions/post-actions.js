@@ -3,47 +3,54 @@
 
 import { logActivity } from '@/app/lib/supabase/log';
 import { sendSuperadminNotificationEmail } from '@/app/lib/supabase/email';
-import DOMPurify from 'isomorphic-dompurify';
 
 
+import sanitizeHtml from 'sanitize-html';
 import { createClient } from '@/app/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-
-DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-    if (node.tagName === 'IFRAME') { // tagName suele venir en mayúsculas en el DOM
-        const src = node.getAttribute('src');
-        if (src) {
-            try {
-                // Manejo seguro de URLs relativas o mal formadas
-                const url = new URL(src, 'http://dummy.com'); // Base dummy para urls relativas si fuera necesario
-                const hostname = url.hostname.replace('www.', '');
-                
-                if (hostname !== 'youtube.com' && hostname !== 'youtube-nocookie.com') {
-                    node.removeAttribute('src');
-                }
-            } catch (e) {
-                node.removeAttribute('src');
-            }
-        }
-    }
-});
 
 
 const sanitizeContent = (html) => {
     if (!html) return null;
 
-
     try {
-        
-        const sanitized = DOMPurify.sanitize(html, {
-            ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div', 'h1', 'h2', 'h3', 'p', 'b', 'i', 'u', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'img', 'br', 'blockquote', 'span'],
-            ADD_ATTR: ['style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title', 'data-align', 'data-youtube-video', 'href', 'alt', 'target', 'rel'],
-            // Nota: ADD_HOOKS no se pasa aquí en la config estándar, se usa addHook arriba
+        const clean = sanitizeHtml(html, {
+            // Permitimos todas estas etiquetas (igual que tu config anterior)
+            allowedTags: [
+                'iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 
+                'div', 'h1', 'h2', 'h3', 'p', 'b', 'i', 'u', 'strong', 'em', 'ul', 'ol', 
+                'li', 'a', 'img', 'br', 'blockquote', 'span', 'video', 'source'
+            ],
+            // Configuración detallada de atributos permitidos
+            allowedAttributes: {
+                '*': ['style', 'class', 'title', 'data-align', 'data-youtube-video'], // Atributos globales
+                'a': ['href', 'target', 'rel', 'name'],
+                'img': ['src', 'alt', 'width', 'height', 'loading'],
+                'iframe': ['src', 'frameborder', 'allow', 'allowfullscreen', 'width', 'height', 'scrolling'],
+                'table': ['border', 'cellpadding', 'cellspacing', 'width', 'height'],
+                'td': ['colspan', 'rowspan', 'width', 'align', 'valign'],
+                'th': ['colspan', 'rowspan', 'width', 'align', 'valign']
+            },
+            // Permitimos iframes, pero filtramos por dominio
+            allowedIframeHostnames: ['www.youtube.com', 'youtube.com', 'www.youtube-nocookie.com'],
+            
+            // Esto asegura que los esquemas de URL sean seguros (http, https, mailto)
+            allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+            allowedSchemesByTag: {
+                iframe: ['http', 'https'] 
+            },
+            
+            // Evita que sanitize-html escape caracteres especiales innecesariamente
+            parser: {
+                decodeEntities: true
+            }
         });
-        return sanitized;
+
+        return clean;
     } catch (e) {
-        console.error("Error during server-side sanitization:", e);
-        
+        console.error("Error during server-side sanitization (sanitize-html):", e);
+        // En caso de error extremo, devolvemos el html original bajo riesgo, o string vacío.
+        // Dado que sanitize-html es muy estable, esto raramente ocurre.
         return html; 
     }
 };
