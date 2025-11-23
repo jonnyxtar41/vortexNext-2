@@ -1,6 +1,9 @@
 import { createClient } from '@/app/utils/supabase/server';
 import { getPublishedPostsSlugs } from '@/app/lib/supabase/posts'; 
 
+
+export const revalidate = 0;
+
 // URL base de tu sitio
 const BASE_URL = 'https://zonavortex.com';
 
