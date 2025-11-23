@@ -29,8 +29,7 @@ export default async function sitemap() {
 
     const postsUrls = posts.map(post => {
         const cleanedPostSlug = generateSlug(post.slug);
-        // Usa el slug de la sección o 'blog' como fallback
-        const sectionSlug = post.sections?.[0]?.slug || 'blog';
+     
         
         return {
             url: `${BASE_URL}/${sectionSlug}/${cleanedPostSlug}`,

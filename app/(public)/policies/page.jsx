@@ -3,6 +3,9 @@ import PoliciesPageClient from './PoliciesPageClient';
 import { Suspense } from 'react';
 import { unstable_noStore as noStore } from 'next/cache';
 
+
+
+
 // 1. Generación de Metadata
 export async function generateMetadata() {
     return {
