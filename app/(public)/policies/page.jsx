@@ -1,11 +1,9 @@
-// app/(public)/policies/page.jsx
-
-import { getSiteContent } from '@/app/lib/supabase/siteContent'; // Usamos la función específica de Vite
-import PoliciesPageClient from './PoliciesPageClient'; // Importamos el nuevo componente cliente
+import { getSiteContent } from '@/app/lib/supabase/siteContent'; 
+import PoliciesPageClient from './PoliciesPageClient'; 
 import { Suspense } from 'react';
 import { unstable_noStore as noStore } from 'next/cache';
 
-// 1. Generación de Metadata (reemplaza a Helmet de Vite)
+// 1. Generación de Metadata
 export async function generateMetadata() {
     return {
         title: 'Políticas - Zona Vortex',
@@ -15,12 +13,25 @@ export async function generateMetadata() {
 
 // 2. El Componente Page (Server Component)
 export default async function PoliciesPage() {
-    noStore(); // Esta página es dinámica, no la queremos cachear estáticamente
+    noStore(); // Forzamos Dynamic Rendering
     
-    // 3. Cargar datos en el servidor
-    // (Usamos la función de la versión Vite para ser precisos)
-    const policiesContent = await getSiteContent('policies_page_content');
-    const content = policiesContent || '<h1>Políticas</h1><p>No se pudo cargar el contenido de las políticas. Por favor, configúralo en el panel de administración.</p>';
+    // Contenido de reserva en caso de fallo
+    const fallbackContent = '<h1>Políticas</h1><p>No se pudo cargar el contenido de las políticas. Por favor, verifica la conexión a la base de datos y la configuración del panel de administración.</p>';
+    
+    let policiesContent = null;
+    
+    // Implementamos try...catch para manejar fallos de conexión
+    try {
+        // 3. Cargar datos en el servidor
+        policiesContent = await getSiteContent('policies_page_content');
+    } catch (error) {
+        // En caso de error durante el build (p. ej., ENV vars)
+        console.error("Error al cargar el contenido de políticas desde Supabase:", error);
+        // policiesContent permanece en null, lo que usa el contenido de reserva
+    }
+
+    // Usamos el contenido cargado o el de reserva
+    const content = policiesContent || fallbackContent;
 
     return (
         // 4. Usar Suspense para un fallback de carga
