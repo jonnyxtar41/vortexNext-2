@@ -1,14 +1,14 @@
 // app/(public)/policies/PoliciesPageClient.jsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import parse from 'html-react-parser';
-import DOMPurify from 'dompurify';
-import AdBlock from '@/app/components/AdBlock'; // Asegúrate que la ruta a AdBlock sea correcta
+// ELIMINADO: import DOMPurify from 'dompurify'; (Ya no lo usamos aquí)
+import AdBlock from '@/app/components/AdBlock';
 import { FileText, Megaphone } from 'lucide-react';
 
-// --- Lógica de Animación (de Vite) ---
+// --- Lógica de Animación ---
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -22,7 +22,7 @@ const itemVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
 };
 
-// --- Lógica de Parseo (de Vite) ---
+// --- Lógica de Parseo ---
 const parseOptions = {
     replace: domNode => {
         if (domNode.name === 'iframe') {
@@ -47,21 +47,11 @@ const parseOptions = {
 };
 
 // --- Componente Cliente ---
-// Recibe 'content' como prop del Server Component
 export default function PoliciesPageClient({ content }) {
-
-    const [sanitizedContent, setSanitizedContent] = useState('');
-
-    // DOMPurify necesita el objeto 'window', por eso usamos useEffect
-    // para sanitizar el HTML en el cliente.
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setSanitizedContent(DOMPurify.sanitize(content, {
-                ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col'],
-                ADD_ATTR: ['style', 'class', 'colspan', 'rowspan', 'src', 'frameBorder', 'allow', 'allowFullScreen']
-            }));
-        }
-    }, [content]);
+    
+    // NOTA: Asumimos que 'content' viene sanitizado desde el servidor (Server Component)
+    // o desde la base de datos (gracias al fix de post-actions.js).
+    // Esto hace la página mucho más rápida al eliminar cálculos en el navegador.
 
     return (
         <div className="bg-background text-foreground pt-12 pb-20">
@@ -71,7 +61,7 @@ export default function PoliciesPageClient({ content }) {
                     initial="hidden"
                     animate="visible"
                 >
-                    {/* Header (de Vite) */}
+                    {/* Header */}
                     <motion.header
                         variants={itemVariants}
                         className="text-center mb-16"
@@ -85,29 +75,25 @@ export default function PoliciesPageClient({ content }) {
                         </p>
                     </motion.header>
 
-                    {/* Layout (de Vite) */}
+                    {/* Layout */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                         <motion.main
                             variants={itemVariants}
                             className="lg:col-span-8"
                         >
                             <div className="glass-effect p-6 sm:p-10 rounded-2xl shadow-xl">
-                                {sanitizedContent ? (
-                                    <div className="prose prose-invert max-w-none prose-lg prose-h1:text-3xl prose-h2:text-2xl prose-h1:font-bold prose-h2:font-semibold prose-a:text-primary hover:prose-a:text-primary/80 transition-colors">
-                                        {parse(sanitizedContent, parseOptions)}
-                                    </div>
-                                ) : (
-                                    // Esqueleto de carga mientras se sanitiza
-                                    <div className="space-y-4">
-                                        <div className="h-8 bg-muted-foreground/20 rounded w-3/Añadido animate-pulse"></div>
-                                        <div className="h-4 bg-muted-foreground/20 rounded w-full animate-pulse"></div>
-                                        <div className="h-4 bg-muted-foreground/20 rounded w-full animate-pulse"></div>
-                                    </div>
-                                )}
+                                {/* Renderizado directo sin espera de sanitización cliente */}
+                                <div className="prose prose-invert max-w-none prose-lg prose-h1:text-3xl prose-h2:text-2xl prose-h1:font-bold prose-h2:font-semibold prose-a:text-primary hover:prose-a:text-primary/80 transition-colors">
+                                    {content ? parse(content, parseOptions) : (
+                                        <div className="space-y-4">
+                                            <p className="text-muted-foreground">Cargando contenido...</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </motion.main>
 
-                        {/* Sidebar (de Vite) */}
+                        {/* Sidebar */}
                         <motion.aside
                             variants={itemVariants}
                             className="lg:col-span-4"
@@ -125,7 +111,7 @@ export default function PoliciesPageClient({ content }) {
                         </motion.aside>
                     </div>
 
-                    {/* Ad inferior (de Vite) */}
+                    {/* Ad inferior */}
                      <motion.div variants={itemVariants} className="mt-16">
                         <AdBlock adKey="footer-banner" variant="banner" />
                     </motion.div>

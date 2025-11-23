@@ -1,7 +1,7 @@
 // app/components/PostClientPage.jsx
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -16,7 +16,7 @@ import { incrementPostStat } from '@/app/lib/supabase/client';
 import AdBlock from '@/app/components/AdBlock';
 import AdLink from '@/app/components/AdLink';
 import { useDownloadModal } from '@/app/context/DownloadModalContext';
-import parse, { domToReact } from 'html-react-parser';
+import parse from 'html-react-parser';
 import CommentsSection from '@/app/components/CommentsSection';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/app/components/ui/dropdown-menu";
 import PostCard from '@/app/components/PostCard';
@@ -33,28 +33,15 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
     const { toast } = useToast();
     const { showModal } = useDownloadModal();
     const router = useRouter();
-    const [sanitizedContent, setSanitizedContent] = useState('');
+    
+    // ELIMINADO: Estado de sanitizedContent y useEffect de dompurify.
+    // Asumimos que 'post.content' ya viene limpio desde el Server Action (post-actions.js)
 
     useEffect(() => {
         if (post) {
             incrementPostStat(post.id, 'visits');
         }
         setCurrentUrl(window.location.href);
-
-        if (post.content) {
-            import('dompurify').then(module => {
-                const DOMPurify = module.default;
-                const sanitized = DOMPurify.sanitize(post.content, {
-                    ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div'],
-                    ADD_ATTR: [
-                        'style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 
-                        'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title',
-                        'data-align', 'data-youtube-video'
-                    ],
-                });
-                setSanitizedContent(sanitized);
-            });
-        }
     }, [post]);
     
     const handleCopyLink = () => {
@@ -267,7 +254,8 @@ export default function PostClientPage({ post, recommendedPosts, similarPosts })
                             )}
                             
                             <div className="prose prose-invert prose-lg max-w-none text-muted-foreground prose-headings:text-foreground prose-h2:text-3xl prose-p:leading-relaxed prose-a:text-link hover:prose-a:text-link-hover prose-img:rounded-xl">
-                                {sanitizedContent && parse(sanitizedContent, parseOptions)}
+                                {/* CAMBIO CLAVE: Usamos post.content directo, ya viene limpio del server */}
+                                {post.content && parse(post.content, parseOptions)}
                             </div>
 
                             <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
