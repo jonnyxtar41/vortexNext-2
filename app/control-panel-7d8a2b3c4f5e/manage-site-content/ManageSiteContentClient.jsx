@@ -10,23 +10,21 @@ import  Input  from '@/app/components/ui/input';
 import { Textarea } from '@/app/components/ui/textarea';
 import { Save, FileText, PlusCircle, Trash2, Upload, Bell, Image as ImageIcon, Search } from 'lucide-react';
 import { getAllSiteContent, updateSiteContent } from '@/app/lib/supabase/siteContent';
-import { uploadSiteAsset } from '@/app/lib/supabase/assets';
+import { uploadSiteAsset } from '@/app/lib/supabase/assets'; // Usamos esta función
 import { getSections, addSection, updateSection, deleteSection } from '@/app/lib/supabase/sections';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { allIcons } from '@/app/lib/icons.js';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/app/components/ui/dialog';
 import TiptapEditor from '@/app/components/TiptapEditor';
+import { createClient } from '@/app/utils/supabase/client'; // Necesario para la subida
 
-// 1. Aceptamos los datos iniciales como props
 const ManageSiteContentClient = ({ initialContent, initialSections, onUpdate }) => {
     const { toast } = useToast();
     
-    // 2. Hidratamos el estado con las props del servidor
     const [content, setContent] = useState(initialContent);
     const [sections, setSections] = useState(initialSections);
     
-    // 3. El 'loading' inicial ya no es para la carga, solo para 'Guardando...'
     const [loading, setLoading] = useState(false); 
     
     const [editingSection, setEditingSection] = useState(null);
@@ -35,12 +33,15 @@ const ManageSiteContentClient = ({ initialContent, initialSections, onUpdate }) 
     const [isIconSelectorOpen, setIsIconSelectorOpen] = useState(false);
     const [iconSearchTerm, setIconSearchTerm] = useState('');
 
-    // Esta función se mantiene para *refrescar* los datos después de una acción
+    // NUEVOS ESTADOS para el Logo/Favicon
+    const [isUploadingAsset, setIsUploadingAsset] = useState(false);
+
     const fetchAllData = async () => {
         setLoading(true);
+        const supabase = createClient();
         const [allContent, sectionsData] = await Promise.all([
-            getAllSiteContent(),
-            getSections(),
+            getAllSiteContent(supabase),
+            getSections(supabase),
         ]);
         const contentMap = allContent.reduce((acc, item) => {
             acc[item.key] = item.value;
@@ -50,11 +51,6 @@ const ManageSiteContentClient = ({ initialContent, initialSections, onUpdate }) 
         setSections(sectionsData);
         setLoading(false);
     };
-
-    // 4. El useEffect de carga inicial SE ELIMINA
-    // useEffect(() => {
-    //     fetchAllData();
-    // }, []);
 
     const handleContentChange = (key, value) => {
         setContent(prev => ({ ...prev, [key]: value }));
@@ -117,7 +113,8 @@ const ManageSiteContentClient = ({ initialContent, initialSections, onUpdate }) 
         let sectionData = { ...editingSection };
 
         if (iconImageFile) {
-            const imageUrl = await uploadSiteAsset(iconImageFile, `section-icons/${Date.now()}-${iconImageFile.name}`);
+            const supabase = createClient();
+            const imageUrl = await uploadSiteAsset(supabase, iconImageFile, `section-icons/${Date.now()}-${iconImageFile.name}`);
             if (imageUrl) {
                 sectionData.icon_image_url = imageUrl;
                 sectionData.icon = null; // Prioritize image over icon
@@ -176,15 +173,40 @@ const ManageSiteContentClient = ({ initialContent, initialSections, onUpdate }) 
             name.toLowerCase().includes(iconSearchTerm.toLowerCase())
         );
     }, [iconSearchTerm]);
+    
+    // NUEVA FUNCIÓN: Manejo de subida de Logo y Favicon
+    const handleAssetUpload = async (key, file) => {
+        if (!file) return;
 
-    // 5. El estado de carga inicial SE ELIMINA
-    // if (loading && Object.keys(content).length === 0) {
-    //     return <p>Cargando contenido del sitio...</p>;
-    // }
+        setIsUploadingAsset(true);
+        toast({ title: `Subiendo ${key === 'site_logo' ? 'Logo' : 'Favicon'}...` });
+        
+        try {
+            const supabase = createClient();
+            // Creamos un path fijo para facilitar la sobrescritura y referenciación estática
+            const fileName = key === 'site_logo' ? 'site_logo.svg' : 'site_favicon.svg';
+            const filePath = `site/${fileName}`; 
+            
+            const imageUrl = await uploadSiteAsset(supabase, file, filePath);
+
+            if (imageUrl) {
+                // Forzamos un parámetro de caché para que la previsualización se actualice
+                const updatedUrl = `${imageUrl}?t=${Date.now()}`;
+                handleContentChange(key, updatedUrl); 
+                toast({ title: `✅ ${key === 'site_logo' ? 'Logo' : 'Favicon'} Subido`, description: "La URL ha sido actualizada.", variant: 'success' });
+            } else {
+                 throw new Error("No se pudo obtener la URL del archivo.");
+            }
+        } catch (error) {
+             toast({ title: `❌ Error al subir ${key === 'site_logo' ? 'Logo' : 'Favicon'}`, description: error.message, variant: "destructive" });
+        } finally {
+            setIsUploadingAsset(false);
+        }
+    };
+
 
     const SelectedIcon = editingSection?.icon ? allIcons[editingSection.icon] : null;
 
-    // Todo el JSX se mantiene 100% igual
     return (
         <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className="text-center mb-12">
@@ -200,21 +222,76 @@ const ManageSiteContentClient = ({ initialContent, initialSections, onUpdate }) 
             <div className="space-y-8">
                  <div className="glass-effect p-6 rounded-2xl">
                     <h3 className="text-xl font-semibold mb-4">Imágenes Globales</h3>
+                    {isUploadingAsset && (
+                        <div className="flex items-center text-yellow-400 mb-4"><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Subiendo archivo...</div>
+                    )}
                     <div className="space-y-6">
+                        {/* WIDGET DE LOGO */}
                         <div className="grid md:grid-cols-[1fr_auto] items-center gap-4">
                             <div>
                                 <Label htmlFor="site_logo">URL del Logo del Sitio</Label>
-                                <Input id="site_logo" value={content.site_logo || ''} onChange={(e) => handleContentChange('site_logo', e.target.value)} className="mt-2 bg-black/30 border-white/20" />
+                                <Input id="site_logo" value={content.site_logo || ''} onChange={(e) => handleContentChange('site_logo', e.target.value)} className="mt-2 bg-black/30 border-white/20" placeholder="O pega una URL de CDN" />
+                                
+                                <label htmlFor="logo-upload" className="cursor-pointer w-full inline-flex items-center gap-2 mt-2 text-sm text-primary hover:underline" aria-disabled={isUploadingAsset}>
+                                    <Upload className="w-4 h-4"/>
+                                    Subir o Reemplazar Logo (SVG/PNG)
+                                    <Input 
+                                        id="logo-upload" 
+                                        type="file" 
+                                        className="hidden" 
+                                        accept="image/svg+xml,image/png" 
+                                        onChange={(e) => handleAssetUpload('site_logo', e.target.files[0])}
+                                        disabled={isUploadingAsset}
+                                    />
+                                </label>
                             </div>
-                            {content.site_logo ? <img src={content.site_logo} alt="Logo Preview" className="h-10 w-auto bg-slate-700 p-1 rounded" /> : <div className="h-10 w-24 bg-slate-700 rounded flex items-center justify-center"><ImageIcon className="w-5 h-5 text-muted-foreground"/></div>}
+                            {/* PREVIEW */}
+                            {content.site_logo ? 
+                                <img 
+                                    src={content.site_logo} 
+                                    alt="Logo Preview" 
+                                    className="h-10 w-auto bg-slate-700 p-1 rounded" 
+                                    style={{ border: isUploadingAsset ? '2px solid yellow' : 'none' }}
+                                /> : 
+                                <div className="h-10 w-24 bg-slate-700 rounded flex items-center justify-center">
+                                    <ImageIcon className="w-5 h-5 text-muted-foreground"/>
+                                </div>
+                            }
                         </div>
+                        
+                        {/* WIDGET DE FAVICON */}
                          <div className="grid md:grid-cols-[1fr_auto] items-center gap-4">
                             <div>
                                 <Label htmlFor="site_favicon">URL del Favicon</Label>
-                                <Input id="site_favicon" value={content.site_favicon || ''} onChange={(e) => handleContentChange('site_favicon', e.target.value)} className="mt-2 bg-black/30 border-white/20" />
+                                <Input id="site_favicon" value={content.site_favicon || ''} onChange={(e) => handleContentChange('site_favicon', e.target.value)} className="mt-2 bg-black/30 border-white/20" placeholder="O pega una URL de CDN" />
+                                
+                                <label htmlFor="favicon-upload" className="cursor-pointer w-full inline-flex items-center gap-2 mt-2 text-sm text-primary hover:underline" aria-disabled={isUploadingAsset}>
+                                    <Upload className="w-4 h-4"/>
+                                    Subir o Reemplazar Favicon (SVG/PNG)
+                                    <Input 
+                                        id="favicon-upload" 
+                                        type="file" 
+                                        className="hidden" 
+                                        accept="image/svg+xml,image/png" 
+                                        onChange={(e) => handleAssetUpload('site_favicon', e.target.files[0])}
+                                        disabled={isUploadingAsset}
+                                    />
+                                </label>
                             </div>
-                            {content.site_favicon ? <img src={content.site_favicon} alt="Favicon Preview" className="h-10 w-10 bg-slate-700 p-1 rounded" /> : <div className="h-10 w-10 bg-slate-700 rounded flex items-center justify-center"><ImageIcon className="w-5 h-5 text-muted-foreground"/></div>}
+                            {/* PREVIEW */}
+                            {content.site_favicon ? 
+                                <img 
+                                    src={content.site_favicon} 
+                                    alt="Favicon Preview" 
+                                    className="h-10 w-10 bg-slate-700 p-1 rounded" 
+                                    style={{ border: isUploadingAsset ? '2px solid yellow' : 'none' }}
+                                /> : 
+                                <div className="h-10 w-10 bg-slate-700 rounded flex items-center justify-center">
+                                    <ImageIcon className="w-5 h-5 text-muted-foreground"/>
+                                </div>
+                            }
                         </div>
+                        {/* Imagen Hero (sin cambiar) */}
                         <div className="grid md:grid-cols-[1fr_auto] items-center gap-4">
                             <div>
                                 <Label htmlFor="hero_image_url">URL de Imagen Principal (Home)</Label>

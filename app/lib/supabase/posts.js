@@ -65,3 +65,26 @@ export const getPopularPostsSlugs = async (supabase, limit = 100) => {
 
     return data || [];
 };
+
+
+
+
+// app/lib/supabase/posts.js (
+
+export const getPublishedPostsSlugs = async (supabase) => {
+    // Nota: El cliente de Supabase se pasa desde el lado del servidor
+    const { data, error } = await supabase
+        .from('posts')
+        // Seleccionamos el slug del post, la sección y la fecha para la URL y lastModified
+        .select('slug, sections(slug), created_at') 
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
+        
+    if (error) {
+        console.error('Error fetching slugs for sitemap:', error);
+        return [];
+    }
+
+    // Devuelve un array de objetos con slug, section.slug y created_at
+    return data || []; 
+};

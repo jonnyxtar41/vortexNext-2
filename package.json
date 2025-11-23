@@ -7,8 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "sitemap": "node tools/generate-sitemap.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.1",
