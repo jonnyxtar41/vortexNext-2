@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer, BubbleMenu } from '@tiptap/react';
-import { nodeInputRule } from '@tiptap/core';
+
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import BaseImage from '@tiptap/extension-image';
@@ -440,7 +440,7 @@ const TiptapEditor = ({ content, onChange, placeholder = "Empieza a escribir aqu
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
     editorProps: {
       attributes: {
-        class: 'prose dark:prose-invert max-w-none focus:outline-none min-h-[200px] bg-background text-foreground p-4 rounded-b-lg border border-input border-t-0 w-full',
+        class: 'prose dark:prose-invert prose-lg max-w-none focus:outline-none min-h-[200px] bg-background text-foreground [&_p]:text-foreground [&_h1]:text-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_li]:text-foreground p-4 rounded-b-lg border border-input border-t-0 w-full',
       },
       handleDrop: (view, event) => {
         const file = event.dataTransfer?.files?.[0];
