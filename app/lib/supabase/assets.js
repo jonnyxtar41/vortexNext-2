@@ -128,6 +128,7 @@ export const uploadBase64Image = async (supabase, dataUrl, folder = 'post-main-i
         .upload(filePath, file, {
             cacheControl: '3600',
             upsert: false,
+            contentType: file.type
         });
 
     if (error) {
