@@ -3,11 +3,30 @@
 
 import { logActivity } from '@/app/lib/supabase/log';
 import { sendSuperadminNotificationEmail } from '@/app/lib/supabase/email';
-import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+import DOMPurify from 'isomorphic-dompurify';
+
+
 import { createClient } from '@/app/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'IFRAME') { // tagName suele venir en mayúsculas en el DOM
+        const src = node.getAttribute('src');
+        if (src) {
+            try {
+                // Manejo seguro de URLs relativas o mal formadas
+                const url = new URL(src, 'http://dummy.com'); // Base dummy para urls relativas si fuera necesario
+                const hostname = url.hostname.replace('www.', '');
+                
+                if (hostname !== 'youtube.com' && hostname !== 'youtube-nocookie.com') {
+                    node.removeAttribute('src');
+                }
+            } catch (e) {
+                node.removeAttribute('src');
+            }
+        }
+    }
+});
 
 
 const sanitizeContent = (html) => {
@@ -15,42 +34,18 @@ const sanitizeContent = (html) => {
 
 
     try {
-        const window = new JSDOM('').window;
-        const DOMPurify = createDOMPurify(window);
-
-
-            
+        
         const sanitized = DOMPurify.sanitize(html, {
             ADD_TAGS: ['iframe', 'table', 'tbody', 'tr', 'td', 'th', 'thead', 'colgroup', 'col', 'div', 'h1', 'h2', 'h3', 'p', 'b', 'i', 'u', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'img', 'br', 'blockquote', 'span'],
             ADD_ATTR: ['style', 'class', 'colspan', 'rowspan', 'src', 'frameborder', 'allow', 'allowfullscreen', 'width', 'height', 'loading', 'title', 'data-align', 'data-youtube-video', 'href', 'alt', 'target', 'rel'],
-            FORBID_TAGS: [],
-            FORBID_ATTR: [],
-            ADD_HOOKS: {
-                afterSanitizeAttributes: (node) => {
-                    if (node.tagName.toLowerCase() === 'iframe') {
-                        const src = node.getAttribute('src');
-                        if (src) {
-                            try {
-                                const url = new URL(src);
-                                if (url.hostname !== 'www.youtube.com' && url.hostname !== 'youtube.com' && url.hostname !== 'www.youtube-nocookie.com') {
-                                    node.removeAttribute('src');
-                                }
-                            } catch (e) {
-                                node.removeAttribute('src');
-                            }
-                        }
-                    }
-                }
-            }
+            // Nota: ADD_HOOKS no se pasa aquí en la config estándar, se usa addHook arriba
         });
         return sanitized;
     } catch (e) {
         console.error("Error during server-side sanitization:", e);
-        // Si la sanitización falla por completo, al menos devolvemos el contenido sin procesar
-        // Opcional: throw new Error("Sanitization failed due to environment error.");
+        
         return html; 
     }
-    
 };
 
 export const addPost = async (postData) => {
