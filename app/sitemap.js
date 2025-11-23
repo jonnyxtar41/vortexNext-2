@@ -50,7 +50,7 @@ export default async function sitemap() {
             priority: 1.00,
         },
         {
-            url: `${BASE_URL}/recursos`,
+            url: `${BASE_URL}/explorar`, // Página de Explorar
             lastModified: new Date().toISOString(),
             changeFrequency: 'monthly',
             priority: 0.80,
